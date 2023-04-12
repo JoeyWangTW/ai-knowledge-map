@@ -1,35 +1,45 @@
 'use client'
 
 import dynamic from "next/dynamic";
-import React, {useRef, useEffect, useState} from 'react';
-import {useResizeDetector} from 'react-resize-detector';
+import React, {useRef, useEffect, useState, useCallback} from 'react';
+import ReactFlow, {
+    MiniMap,
+    Controls,
+    Background,
+    useNodesState,
+    useEdgesState,
+    addEdge,
+} from 'reactflow';
+import 'reactflow/dist/style.css';
 
 function Graph(){
 
-    const {width, height, ref} = useResizeDetector();
-    const ForceGraph2D = dynamic(() => import('react-force-graph').then((r) => r.ForceGraph2D), { ssr: false });
-    let data = {    nodes: [
-                { id: "0x0000001", balance: 10, index: 0},
-                    { id: "0x0000002", balance: 1, index: 1},
-                    { id: "0x0000003", balance: 3, index: 2},
-                    { id: "0x0000004", balance: 6, index: 3}
-            ],
-      links: [
-        { source: "0x0000001", target: "0x0000002", value: 2},
-        { source: "0x0000002", target: "0x0000001", value: 3},
-        { source: "0x0000002", target: "0x0000003", value: 8 },
-        { source: "0x0000004", target: "0x0000003", value: 10 },
-        { source: "0x0000001", target: "0x0000003", value: 6 },
-        { source: "0x0000004", target: "0x0000001", value: 6 },
-      ]
-    };
+    const defaultViewport: Viewport = { x: 100, y:100, zoom: 100 };
 
-    return <div ref={ref} className="h-screen w-screen">
-            <ForceGraph2D
-                graphData={data}
-    width={width}
-    height={height}
-        />
+    const initialNodes = [
+        { id: '1', position: { x: 0, y: 0 }, data: { label: '1' } },
+        { id: '2', position: { x: 0, y: 100 }, data: { label: '2' } },
+    ];
+    const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+    const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
+    return <div className="h-screen w-screen">
+        <ReactFlow
+            defaultViewport={defaultViewport}
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+        >
+            <Controls />
+            <MiniMap />
+            <Background variant="dots" gap={12} size={1} />
+        </ReactFlow>
     </div>
 }
 
