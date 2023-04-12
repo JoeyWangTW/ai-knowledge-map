@@ -1,6 +1,6 @@
 'use client';
 
-import React, {FC, useState} from 'react';
+import React, {useState} from 'react';
 import Graph from "./graph"
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
     setShowGraph(true);
   };
   return (
-    <main className="font-mono flex items-center justify-center w-full flex-1 text-center">
+    <main className="font-mono flex items-center justify-center w-screen h-screen flex-1 text-center">
       {showGraph ?
        <Graph /> :
        <div>
@@ -20,8 +20,7 @@ export default function Home() {
          <button onClick={handleButtonClick} className="rounded-xl border border-white p-4 hover:border-b-2 hover:border-r-2">
            Get Started
          </button>
-       </div>
-      }
+       </div>}
     </main>
   )
 }
