@@ -25,8 +25,8 @@ function Node({ id, data}) {
     const onAutoClicked = useCallback(() => {
         data.addNode({addNode: data.addNode,
                       sourceId: id,
-                      xOffset: -650,
-                      yOffset: -100,
+                      xOffset: -850,
+                      yOffset: -300,
                       handle: `l`})
     },[data]);
     const onMoreClicked = useCallback(() => {
@@ -39,62 +39,29 @@ function Node({ id, data}) {
     const onCustomClicked = useCallback(() => {
         data.addNode({addNode: data.addNode,
                       sourceId: id,
-                      xOffset: 650,
-                      yOffset: -100,
+                      xOffset: 850,
+                      yOffset: -300,
                       handle: `r`})
     },[data]);
 
     const content =
         `
 Overview of Generative AI
--------------------------
 
 Generative AI is a subfield of artificial intelligence that focuses on creating new data or content that resembles existing data. This technology has gained popularity due to its applications in art, music, text generation, and more. At the core of generative AI are generative models, which learn patterns and structures within data to create realistic outputs.
 
 ### Top Level Learning Syllabus
 
-1. **Introduction to Generative AI**
-
-    *   Generative models vs. discriminative models
-    *   Types of generative models: parametric and non-parametric
-    *   Applications of generative AI
-2. **Probability and Statistics**
-
-    *   Probability distributions
-    *   Maximum likelihood estimation
-    *   Bayesian inference
-3. **Variational Autoencoders (VAEs)**
-
-    *   Encoder and decoder architectures
-    *   Variational inference
-    *   Applications of VAEs
-4. **Generative Adversarial Networks (GANs)**
-
-    *   Generator and discriminator networks
-    *   GAN training process
-    *   Variants of GANs (DCGAN, CycleGAN, etc.)
-    *   Applications of GANs
-5. **Autoregressive Models**
-
-    *   PixelRNN and PixelCNN
-    *   Sequence generation with RNNs and LSTMs
-    *   Applications of autoregressive models
-6. **Transformer-based Models**
-
-    *   Attention mechanism
-    *   GPT, GPT-2, and GPT-3
-    *   Applications of transformer-based models
-7. **Advanced Topics**
-
-    *   Conditional generation
-    *   Style transfer
-    *   Ethical considerations and challenges in generative AI
+**Introduction to Generative AI**
+- Generative models vs. discriminative models
+- Types of generative models: parametric and non-parametric
+- Applications of generative AI
         `
     return (
         <>
-            <div className="h-fit-content border border-2 border-black bg-white text-black rounded-md max-w-xl">
+            <div className="h-fit-content border border-2 border-black bg-white text-black rounded-md max-w-3xl">
                 <h2 className="border-b-2 border-black p-4">Start Here </h2>
-                <div className="border-b-2 border-black p-4 text-left">
+                <div className="prose border-b-2 border-black p-4 text-left">
                     <ReactMarkdown>{content}</ReactMarkdown>
                 </div>
                 <div className="flex flex-row">
