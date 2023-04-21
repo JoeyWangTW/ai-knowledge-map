@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import { relative } from "path";
 import React, {useRef, useEffect, useState, useCallback, useMemo} from 'react';
 import ReactMarkdown from 'react-markdown'
 import ReactFlow, {
@@ -11,9 +12,34 @@ import ReactFlow, {
     addEdge,
     useReactFlow,
     Handle,
+    NodeResizeControl,
     Position
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+
+function ResizeIcon() {
+  return (
+      <div className="absolute right-4 bottom-20">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      stroke="#000000"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <polyline points="16 20 20 20 20 16" />
+      <line x1="14" y1="14" x2="20" y2="20" />
+      <polyline points="8 4 4 4 4 8" />
+      <line x1="4" y1="4" x2="10" y2="10" />
+    </svg>
+      </div>
+  );
+}
 
 function Node({ id, data}) {
 
@@ -44,6 +70,11 @@ function Node({ id, data}) {
                       handle: `r`})
     },[data]);
 
+    const controlStyle = {
+        background: 'transparent',
+        border: 'none',
+    };
+
     const content =
         `
 Overview of Generative AI
@@ -57,43 +88,46 @@ Generative AI is a subfield of artificial intelligence that focuses on creating 
 - Types of generative models: parametric and non-parametric
 - Applications of generative AI
         `
-    return (
-        <>
-            <div className="h-fit-content border border-2 border-black bg-white text-black rounded-md max-w-3xl">
-                <h2 className="border-b-2 border-black p-4">Start Here </h2>
-                <div className="prose border-b-2 border-black p-4 text-left">
-                    <ReactMarkdown>{content}</ReactMarkdown>
+        return (
+            <div className="relative">
+                <NodeResizeControl style={controlStyle}>
+                    <ResizeIcon/>
+                </NodeResizeControl>
+                <div className="h-full border border-2 border-black bg-white text-black rounded-md">
+                    <h2 className="border-b-2 border-black p-4">Start Here </h2>
+                    <div className="prose p-4 text-left">
+                        <ReactMarkdown>{content}</ReactMarkdown>
+                    </div>
+                    <div className="flex flex-row">
+                        <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black hover:bg-gray-100" onClick={onAutoClicked}>Auto</button>
+                        <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black hover:bg-gray-100" onClick={onMoreClicked}>More</button>
+                        <button className="basis-1/3 p-4 border-t-2 border-black hover:bg-gray-100" onClick={onCustomClicked}>Custom</button>
+                    </div>
                 </div>
-                <div className="flex flex-row">
-                    <button className="basis-1/3 p-4 border-r-2 border-black hover:bg-gray-100" onClick={onAutoClicked}>Auto</button>
-                    <button className="basis-1/3 p-4 border-r-2 border-black hover:bg-gray-100" onClick={onMoreClicked}>More</button>
-                    <button className="basis-1/3 p-4 hover:bg-gray-100" onClick={onCustomClicked}>Custom</button>
-                </div>
+                <Handle
+                    type = "target"
+                    position = {Position.Top}
+                    id = {topHandleId}
+                />
+                <Handle
+                    type = "source"
+                    position = {Position.Bottom}
+                    style ={{left:60}}
+                    id = {autoHandleId}
+                />
+                <Handle
+                    type = "source"
+                    position = {Position.Bottom}
+                    id = {moreHandleId}
+                />
+                <Handle
+                    type = "source"
+                    position = {Position.Bottom}
+                    style ={{right:60, left: 'auto'}}
+                    id = {customHandleId}
+                />
             </div>
-            <Handle
-                type = "target"
-                position = {Position.Top}
-                id = {topHandleId}
-            />
-            <Handle
-                type = "source"
-                position = {Position.Bottom}
-                style ={{left:60}}
-                id = {autoHandleId}
-            />
-            <Handle
-                type = "source"
-                position = {Position.Bottom}
-                id = {moreHandleId}
-            />
-            <Handle
-                type = "source"
-                position = {Position.Bottom}
-                style ={{right:60, left: 'auto'}}
-                id = {customHandleId}
-            />
-        </>
-    )
+        )
 }
 
 let id = 1
