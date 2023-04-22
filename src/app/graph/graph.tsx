@@ -16,7 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import { useSearchParams } from 'next/navigation';
 import 'reactflow/dist/style.css';
-import TopicNode from './node.tsx'
+import {TopicNode, SummaryNode} from './node.tsx'
 import { initialize } from "next/dist/server/lib/render-server.js";
 
 let id = 1
@@ -30,7 +30,8 @@ function Flow(){
     const [initialized, setInitialized] = useState(false)
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const nodeTypes = useMemo(() => ({ topicNode: TopicNode}), []);
+    const nodeTypes = useMemo(() => ({ topicNode: TopicNode,
+                                       summaryNode: SummaryNode}), []);
 
     useEffect(() => {
 

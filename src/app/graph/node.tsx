@@ -36,11 +36,36 @@ function ResizeIcon() {
   );
 }
 
-function SummaryNode(){
+export function SummaryNode({id, data}) {
+     const topHandleId = `${id}-t`;
+
+    const controlStyle = {
+        background: 'transparent',
+        border: 'none',
+    };
+   const content = data.content
+   return (
+       <div className="relative">
+           <NodeResizeControl style={controlStyle}>
+               <ResizeIcon/>
+           </NodeResizeControl>
+           <div className="h-full border border-2 border-black bg-white text-black rounded-xl">
+               <h2 className="border-b-2 border-black p-4">{data.title}</h2>
+               <div className="prose p-4 text-left max-w-max">
+                   <ReactMarkdown>{content}</ReactMarkdown>
+               </div>
+           </div>
+           <Handle
+               type = "target"
+               position = {Position.Top}
+               id = {topHandleId}
+           />
+       </div>
+   )
 
 }
 
-function TopicNode({id, data}) {
+export function TopicNode({id, data}) {
 
     const topHandleId = `${id}-t`;
     const autoHandleId = `${id}-b-l`;
@@ -58,6 +83,7 @@ function TopicNode({id, data}) {
     const onConvergeClicked = useCallback(() => {
         data.addNode({addNode: data.addNode,
                       sourceId: id,
+                      type: 'summaryNode',
                       xOffset: 0,
                       yOffset: 20,
                       handle: `m`})
@@ -120,5 +146,3 @@ function TopicNode({id, data}) {
             </div>
         )
 }
-
-export default TopicNode
