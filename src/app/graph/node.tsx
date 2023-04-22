@@ -36,7 +36,11 @@ function ResizeIcon() {
   );
 }
 
-function Node({id, data}) {
+function SummaryNode(){
+
+}
+
+function TopicNode({id, data}) {
 
     const topHandleId = `${id}-t`;
     const autoHandleId = `${id}-b-l`;
@@ -45,6 +49,7 @@ function Node({id, data}) {
 
     const onDivergeClicked = useCallback(() => {
         data.addNode({addNode: data.addNode,
+                      type: 'topicNode',
                       sourceId: id,
                       xOffset: -850,
                       yOffset: -300,
@@ -83,9 +88,9 @@ function Node({id, data}) {
                     </div>
                     <div className="flex flex-row">
                         <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black hover:bg-gray-100"
-                                onClick={onDivergeClicked}>Diverge</button>
+                                onClick={onDivergeClicked}>Explore Subtopics</button>
                         <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black hover:bg-gray-100"
-                                onClick={onConvergeClicked}>Converge</button>
+                                onClick={onConvergeClicked}>Key Takeaways</button>
                         <button className="basis-1/3 p-4 border-t-2 border-black enabled:hover:bg-gray-100 disabled:text-gray-500"
                                 disabled onClick={onCustomClicked}>Custom</button>
                     </div>
@@ -116,4 +121,4 @@ function Node({id, data}) {
         )
 }
 
-export default Node
+export default TopicNode

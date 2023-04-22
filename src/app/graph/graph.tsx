@@ -1,21 +1,22 @@
 import { relative } from "path";
 import React, {useRef, useEffect, useState, useCallback, useMemo} from 'react';
 import ReactFlow, {
-    MiniMap,
-    Controls,
-    Background,
-    useNodesState,
-    ReactFlowProvider,
-    useEdgesState,
-    addEdge,
-    useReactFlow,
-    Handle,
-    NodeResizeControl,
-    Position
+  MiniMap,
+  Controls,
+  Background,
+  useNodesState,
+  ReactFlowProvider,
+  useEdgesState,
+  addEdge,
+  useReactFlow,
+  Handle,
+  NodeResizeControl,
+  Position,
+  useNodesInitialized
 } from 'reactflow';
 import { useSearchParams } from 'next/navigation';
 import 'reactflow/dist/style.css';
-import Node from './node.tsx'
+import TopicNode from './node.tsx'
 import { initialize } from "next/dist/server/lib/render-server.js";
 
 let id = 1
@@ -23,26 +24,24 @@ const getId = () => `${id++}`
 
 function Flow(){
 
+    const nodesInitialized = useNodesInitialized();
     const searchParams = useSearchParams()
     const reactFlowInstance = useReactFlow();
     const [initialized, setInitialized] = useState(false)
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const nodeTypes = useMemo(() => ({ customNode: Node}), []);
+    const nodeTypes = useMemo(() => ({ topicNode: TopicNode}), []);
 
     useEffect(() => {
-      if(nodes.length === 1){
-        const timeout = setTimeout(() => {
+
+      if(nodesInitialized){
           reactFlowInstance.fitView({padding: 0.5});
           setInitialized(true)
-        }, 100);
-    }
-
-    }, [reactFlowInstance, nodes.length]);
+        };
+    }, [reactFlowInstance, nodesInitialized]);
 
     const addNode = useCallback((props) => {
 
-        console.warn(nodes, props)
         const id = getId()
         const newNodeId = `node-${id}`;
         const newEdgeId = `edge-${id - 1}`;
@@ -51,7 +50,7 @@ function Flow(){
         setNodes((nds) => {
             const sourceNode = nds.find(node => node.id === sourceId);
             return nds.concat({id: newNodeId,
-                        type: 'customNode',
+                        type: props.type,
                         position: {x: sourceNode.position.x + props.xOffset,
                                    y: sourceNode.position.y + sourceNode.height + props.yOffset},
                         data: {addNode: props.addNode}})});
@@ -71,7 +70,7 @@ function Flow(){
         const data = await response.json();
         const content = data.choices[0].message.content;
       setNodes([{ id: "node-0" ,
-                  type: 'customNode',
+                  type: 'topicNode',
                   position: {x: 0, y: 0},
                   data: {addNode:addNode,
                          title: topic,
