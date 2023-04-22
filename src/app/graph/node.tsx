@@ -46,9 +46,9 @@ export function SummaryNode({id, data}) {
    const content = data.content
    return (
        <div className="relative">
-           <NodeResizeControl style={controlStyle}>
-               <ResizeIcon/>
-           </NodeResizeControl>
+                <NodeResizeControl style={controlStyle}>
+                    <ResizeIcon/>
+                </NodeResizeControl>
            <div className="h-full border border-2 border-black bg-white text-black rounded-xl">
                <h2 className="border-b-2 border-black p-4">{data.title}</h2>
                <div className="prose p-4 text-left max-w-max">
@@ -104,20 +104,17 @@ export function TopicNode({id, data}) {
     const content = data.content
         return (
             <div className="relative">
-                <NodeResizeControl style={controlStyle}>
-                    <ResizeIcon/>
-                </NodeResizeControl>
-                <div className="h-full border border-2 border-black bg-white text-black rounded-xl">
+                <div className="h-full w-[400px] border border-2 border-black bg-white text-black rounded-xl">
                     <h2 className="border-b-2 border-black p-4">{data.title}</h2>
                     <div className="prose p-4 text-left max-w-max">
                         <ReactMarkdown>{content}</ReactMarkdown>
                     </div>
                     <div className="flex flex-row">
-                        <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black hover:bg-gray-100"
+                        <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black hover:bg-gray-100 rounded-bl-xl"
                                 onClick={onDivergeClicked}>Explore Subtopics</button>
                         <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black hover:bg-gray-100"
                                 onClick={onConvergeClicked}>Key Takeaways</button>
-                        <button className="basis-1/3 p-4 border-t-2 border-black enabled:hover:bg-gray-100 disabled:text-gray-500"
+                        <button className="basis-1/3 p-4 border-t-2 border-black enabled:hover:bg-gray-100 disabled:text-gray-500 rounded-br-xl"
                                 disabled onClick={onCustomClicked}>Custom</button>
                     </div>
                 </div>

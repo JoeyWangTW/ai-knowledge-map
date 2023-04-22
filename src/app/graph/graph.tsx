@@ -69,14 +69,35 @@ function Flow(){
       try {
         const response = await fetch(`/api/initialize-graph?topic=${topic}`);
         const data = await response.json();
-        const content = data.choices[0].message.content;
-      setNodes([{ id: "node-0" ,
-                  type: 'topicNode',
-                  position: {x: 0, y: 0},
-                  data: {addNode:addNode,
-                         title: topic,
-                         content: content}}])
-      } catch (error) {
+        const initialResponse = JSON.parse(data.choices[0].message.content);
+        console.log(initialResponse)
+        const initialNodes = [{ id: "node-0" ,
+                    type: 'topicNode',
+                    width: 400,
+                    position: {x: 0, y: 0},
+                    data: {addNode:addNode,
+                           title: initialResponse.topic,
+                           content: initialResponse.summary}}];
+        const initialEdges = []
+        initialResponse.subtopics.forEach((item, index) => {
+          const id = getId()
+          initialNodes.push({ id: `node-${id}` ,
+                    type: 'topicNode',
+                              position: {x: 400 * (index - Math.floor(initialResponse.subtopics.length/2)),
+                               y: 700},
+                    width: 400,
+                    data: {addNode:addNode,
+                           title: item.topic,
+                           content: item.description}})
+          initialEdges.push({id: `edge-${id - 1}`,
+                             source: `node-0`,
+                             target: `node-${id}`,
+                             targetHandle: `node-${id}-t`,
+                             sourceHandle:`node-0-b-l`})
+        });
+        setNodes(initialNodes)
+        setEdges(initialEdges)
+        } catch (error) {
         console.error('Error fetching data:', error);
       }
       }
