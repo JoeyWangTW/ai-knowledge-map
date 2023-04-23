@@ -15,7 +15,8 @@ list out essential subtopics that can help fully understand the topic above, all
 result should be in json format
 
 subtopics: [{topic: subtopic 1, description: short description of the topic},
-{topic: subtopic 2, description: short description of the topic}]`
+{topic: subtopic 2, description: short description of the topic}]
+reply in the same language of ${topic}`
 
     const topicOverviewResponse = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
