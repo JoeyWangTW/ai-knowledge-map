@@ -19,7 +19,7 @@ export default function Home() {
    };
 
     return (
-        <main className="font-mono flex items-center justify-center w-screen h-screen flex-1 text-center">
+        <main className="font-mono flex items-center justify-center w-screen h-screen flex-1 text-center bg-zinc-800 text-white">
             <Analytics/>
             <div>
                 <h1 className="text-5xl py-6">

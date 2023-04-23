@@ -15,7 +15,7 @@ import ReactFlow, {
   Position,
   useNodesInitialized
 } from 'reactflow';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import 'reactflow/dist/style.css';
 import {TopicNode, SummaryNode} from './node'
 import { initialize } from "next/dist/server/lib/render-server.js";
@@ -33,19 +33,20 @@ function Flow(){
   const nodesInitialized = useNodesInitialized();
     const searchParams = useSearchParams()
     const reactFlowInstance = useReactFlow();
-    const [initialized, setInitialized] = useState(false)
+    const [pageInitialized, setPageInitialized] = useState(false)
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const nodeTypes: NodeTypes = useMemo(()=>({topicNode: TopicNode,
                                                summaryNode: SummaryNode}), [])
+    const router = useRouter();
 
-    useEffect(() => {
+   useEffect(() => {
 
-      if(nodesInitialized){
+      if(nodesInitialized && !pageInitialized){
           reactFlowInstance.fitView({padding: 0.5});
-          setInitialized(true)
+          setPageInitialized(true)
         };
-    }, [reactFlowInstance, nodesInitialized]);
+    }, [reactFlowInstance, nodesInitialized, pageInitialized]);
 
   type AddNodeParams = {
   sourceId: string;
@@ -116,8 +117,10 @@ function Flow(){
         setNodes(initialNodes)
         setEdges(initialEdges)
         } catch (error) {
-        console.error('Error fetching data:', error);
-      }
+          console.error('Error fetching data:', error);
+          alert("Sorry, something went wrong. Please try again.")
+          router.push(`/`);
+        }
       }
       if (topic){
         fetchData(topic);
@@ -125,7 +128,7 @@ function Flow(){
         console.error("topic missing")
       }
 
-    },[searchParams, setEdges, addNode, setNodes]);
+    },[searchParams, setEdges, addNode, setNodes, router]);
 
   //const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -143,7 +146,7 @@ function Flow(){
   <Controls className="bg-white" />
   <MiniMap />
     </ReactFlow>
-    {!initialized && (
+    {!pageInitialized && (
       <div className="absolute h-screen w-screen top-0 z-10 bg-zinc-800 flex justify-center items-center">
         <div className="w-5 h-5 object-center animate-spin bg-white"></div>
       </div>
