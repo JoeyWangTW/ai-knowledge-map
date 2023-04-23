@@ -36,8 +36,8 @@ function ResizeIcon() {
   );
 }
 
-export function SummaryNode({id, data}) {
-     const topHandleId = `${id}-t`;
+export function SummaryNode({ id, data }: { id: string; data: { title: string; content: string }}) {
+    const topHandleId = `${id}-t`;
 
     const controlStyle = {
         background: 'transparent',
@@ -62,7 +62,9 @@ export function SummaryNode({id, data}) {
 
 }
 
-export function TopicNode({id, data}) {
+export function TopicNode({ id, data }:
+                          { id: string;
+                            data: { title: string;content: string; addNode: (node: any) => void}}) {
 
     const topHandleId = `${id}-t`;
     const divergeHandleId = `${id}-b-l`;
@@ -73,14 +75,15 @@ export function TopicNode({id, data}) {
 
     const onDivergeClicked = useCallback(() => {
         setDivergeStatus("loading")
-        async function fetchData(topic) {
+        async function fetchData() {
              try {
-                 const response = await fetch(`/api/diverge?topic=${topic} ${data.content}`);
+                 const response = await fetch(`/api/diverge?topic=${data.title} ${data.content}`);
                  const subtopicData = await response.json();
                  console.log(subtopicData.choices[0].message.content)
                  const subtopicResponse = subtopicData.choices[0].message.content;
                  const subtopics = JSON.parse(subtopicResponse).subtopics
-                 subtopics.forEach((item, index) => {
+                 subtopics.forEach((item: {topic: string, description: string},
+                                           index: number) => {
                      data.addNode({addNode: data.addNode,
                                   type: 'topicNode',
                                   sourceId: id,
@@ -97,13 +100,13 @@ export function TopicNode({id, data}) {
                  setDivergeStatus("ready")
              }
         }
-        fetchData(data.title)
+        fetchData()
 
     },[data, id]);
     const onConvergeClicked = useCallback(() => {
         setConvergeStatus("loading")
         console.log(data)
-        async function fetchData(topic) {
+        async function fetchData(topic: string) {
              try {
                  const response = await fetch(`/api/converge?topic=${data.content}`);
                  const summaryData = await response.json();

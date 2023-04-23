@@ -7,10 +7,10 @@ export default function Home() {
 
     const router = useRouter();
     const [topic, setTopic] = useState('')
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTopic(e.target.value);
     };
-    const handleTopicSubmit = (e) => {
+    const handleTopicSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         router.push(`/graph?topic=${topic}`);
    };

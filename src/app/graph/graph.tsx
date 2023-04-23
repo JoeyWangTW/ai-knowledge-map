@@ -10,6 +10,7 @@ import ReactFlow, {
   addEdge,
   useReactFlow,
   Handle,
+  NodeTypes,
   NodeResizeControl,
   Position,
   useNodesInitialized
@@ -19,20 +20,24 @@ import 'reactflow/dist/style.css';
 import {TopicNode, SummaryNode} from './node'
 import { initialize } from "next/dist/server/lib/render-server.js";
 
-let id = 1
-const getId = () => `${id++}`
+let id: number = 1
+const getId = () => {
+  const currentId = id;
+  id++;
+  return `${currentId}`;
+};
 const maxZoom = 10
 
 function Flow(){
 
-    const nodesInitialized = useNodesInitialized();
+  const nodesInitialized = useNodesInitialized();
     const searchParams = useSearchParams()
     const reactFlowInstance = useReactFlow();
     const [initialized, setInitialized] = useState(false)
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const nodeTypes = useMemo(() => ({ topicNode: TopicNode,
-                                       summaryNode: SummaryNode}), []);
+    const nodeTypes: NodeTypes = useMemo(()=>({topicNode: TopicNode,
+                                               summaryNode: SummaryNode}), [])
 
     useEffect(() => {
 
@@ -42,21 +47,33 @@ function Flow(){
         };
     }, [reactFlowInstance, nodesInitialized]);
 
-    const addNode = useCallback(({sourceId, type, xOffset, yOffset, title, content, handle}) => {
+  type AddNodeParams = {
+  sourceId: string;
+  type: string;
+  xOffset: number;
+  yOffset: number;
+  title: string;
+  content: string;
+  handle: string;
+  };
+
+  const addNode = useCallback(({sourceId, type, xOffset, yOffset, title, content, handle}: AddNodeParams) => {
 
         const id = getId()
         const newNodeId = `node-${id}`;
-        const newEdgeId = `edge-${id - 1}`;
+        const newEdgeId = `edge-${parseInt(id) - 1}`;
 
-        setNodes((nds) => {
+    setNodes((nds) => {
             const sourceNode = nds.find(node => node.id === sourceId);
-            return nds.concat({id: newNodeId,
+            if(sourceNode && sourceNode.position && sourceNode.height){
+              return nds.concat({id: newNodeId,
                         type: type,
                         position: {x: sourceNode.position.x + xOffset,
                                    y: sourceNode.position.y + sourceNode.height + yOffset},
                         data: {title: title,
                                content: content,
-                               addNode: addNode}})});
+                               addNode: addNode}})}
+      else{ return nds }})
         setEdges((eds) => eds.concat({id: newEdgeId,
                                       source: `${sourceId}`,
                                       target: newNodeId,
@@ -67,7 +84,7 @@ function Flow(){
     useEffect(() => {
       const topic = searchParams.get('topic')
 
-      async function fetchData(topic) {
+      async function fetchData(topic: string) {
       try {
         const response = await fetch(`/api/initialize-graph?topic=${topic}`);
         const data = await response.json();
@@ -79,8 +96,9 @@ function Flow(){
                     data: {addNode: addNode,
                            title: initialResponse.topic,
                            content: initialResponse.summary}}];
-        const initialEdges = []
-        initialResponse.subtopics.forEach((item, index) => {
+        const initialEdges: { id: string; source: string; target: string; targetHandle: string; sourceHandle: string }[] = [];
+        initialResponse.subtopics.forEach((item: {topic: string, description: string},
+                                           index: number) => {
           const id = getId()
           initialNodes.push({ id: `node-${id}` ,
                     type: 'topicNode',
@@ -89,7 +107,7 @@ function Flow(){
                     data: {addNode: addNode,
                            title: item.topic,
                            content: item.description}})
-          initialEdges.push({id: `edge-${id - 1}`,
+          initialEdges.push({id: `edge-${parseInt(id) - 1}`,
                              source: `node-0`,
                              target: `node-${id}`,
                              targetHandle: `node-${id}-t`,
@@ -101,8 +119,11 @@ function Flow(){
         console.error('Error fetching data:', error);
       }
       }
-
-      fetchData(topic);
+      if (topic){
+        fetchData(topic);
+      } else {
+        console.error("topic missing")
+      }
 
     },[searchParams, setEdges, addNode, setNodes]);
 
