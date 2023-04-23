@@ -11,6 +11,7 @@ import ReactFlow, {
     NodeResizeControl,
     Position
 } from 'reactflow';
+import va from '@vercel/analytics';
 
 function ResizeIcon() {
   return (
@@ -75,6 +76,7 @@ export function TopicNode({ id, data }:
 
     const onDivergeClicked = useCallback(() => {
         setDivergeStatus("loading")
+        va.track("topic_diverged")
         async function fetchData() {
              try {
                  const response = await fetch(`/api/diverge?topic=${data.title} ${data.content}`);
@@ -105,6 +107,7 @@ export function TopicNode({ id, data }:
     },[data, id]);
     const onConvergeClicked = useCallback(() => {
         setConvergeStatus("loading")
+        va.track("topic_converged")
         console.log(data)
         async function fetchData(topic: string) {
              try {

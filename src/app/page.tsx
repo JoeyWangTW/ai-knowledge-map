@@ -2,6 +2,8 @@
 
 import React, {useState} from 'react';
 import { useRouter } from 'next/navigation';
+import { Analytics } from '@vercel/analytics/react';
+import va from '@vercel/analytics';
 
 export default function Home() {
 
@@ -12,11 +14,13 @@ export default function Home() {
     };
     const handleTopicSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        va.track("topic_submitted", {topic: `${topic}`})
         router.push(`/graph?topic=${topic}`);
    };
 
     return (
         <main className="font-mono flex items-center justify-center w-screen h-screen flex-1 text-center">
+            <Analytics/>
             <div>
                 <h1 className="text-5xl py-6">
                     Enter a Topic to Start Exploring
