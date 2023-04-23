@@ -42,28 +42,27 @@ function Flow(){
         };
     }, [reactFlowInstance, nodesInitialized]);
 
-    const addNode = useCallback((props) => {
+    const addNode = useCallback(({sourceId, type, xOffset, yOffset, title, content, handle}) => {
 
         const id = getId()
         const newNodeId = `node-${id}`;
         const newEdgeId = `edge-${id - 1}`;
-        const sourceId = props.sourceId
 
         setNodes((nds) => {
             const sourceNode = nds.find(node => node.id === sourceId);
             return nds.concat({id: newNodeId,
-                        type: props.type,
-                        position: {x: sourceNode.position.x + props.xOffset,
-                                   y: sourceNode.position.y + sourceNode.height + props.yOffset},
-                        data: {title: props.title,
-                               content: props.content,
+                        type: type,
+                        position: {x: sourceNode.position.x + xOffset,
+                                   y: sourceNode.position.y + sourceNode.height + yOffset},
+                        data: {title: title,
+                               content: content,
                                addNode: addNode}})});
         setEdges((eds) => eds.concat({id: newEdgeId,
                                       source: `${sourceId}`,
                                       target: newNodeId,
                                       targetHandle: `node-${id}-t`,
-                                      sourceHandle:`${sourceId}-b-${props.handle}`}));
-    },[nodes])
+                                      sourceHandle:`${sourceId}-b-${handle}`}));
+    },[setNodes, setEdges])
 
     useEffect(() => {
       const topic = searchParams.get('topic')
@@ -105,7 +104,7 @@ function Flow(){
 
       fetchData(topic);
 
-    },[]);
+    },[searchParams, setEdges, addNode, setNodes]);
 
   //const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 

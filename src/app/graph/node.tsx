@@ -99,7 +99,7 @@ export function TopicNode({id, data}) {
         }
         fetchData(data.title)
 
-    },[data]);
+    },[data, id]);
     const onConvergeClicked = useCallback(() => {
         setConvergeStatus("loading")
         console.log(data)
@@ -124,14 +124,14 @@ export function TopicNode({id, data}) {
              }
         }
         fetchData(data.title)
-    },[data]);
+    },[data, id]);
     const onCustomClicked = useCallback(() => {
         data.addNode({addNode: data.addNode,
                       sourceId: id,
                       xOffset: 850,
                       yOffset: -300,
                       handle: `r`})
-    },[data]);
+    },[data, id]);
 
     const controlStyle = {
         background: 'transparent',
