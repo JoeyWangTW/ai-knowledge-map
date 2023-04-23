@@ -16,7 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import { useSearchParams } from 'next/navigation';
 import 'reactflow/dist/style.css';
-import {TopicNode, SummaryNode} from './node.tsx'
+import {TopicNode, SummaryNode} from './node'
 import { initialize } from "next/dist/server/lib/render-server.js";
 
 let id = 1
