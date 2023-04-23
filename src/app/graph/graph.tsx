@@ -21,6 +21,7 @@ import { initialize } from "next/dist/server/lib/render-server.js";
 
 let id = 1
 const getId = () => `${id++}`
+const maxZoom = 10
 
 function Flow(){
 
@@ -54,7 +55,9 @@ function Flow(){
                         type: props.type,
                         position: {x: sourceNode.position.x + props.xOffset,
                                    y: sourceNode.position.y + sourceNode.height + props.yOffset},
-                        data: {addNode: props.addNode}})});
+                        data: {title: props.title,
+                               content: props.content,
+                               addNode: addNode}})});
         setEdges((eds) => eds.concat({id: newEdgeId,
                                       source: `${sourceId}`,
                                       target: newNodeId,
@@ -73,9 +76,8 @@ function Flow(){
         console.log(initialResponse)
         const initialNodes = [{ id: "node-0" ,
                     type: 'topicNode',
-                    width: 400,
                     position: {x: 0, y: 0},
-                    data: {addNode:addNode,
+                    data: {addNode: addNode,
                            title: initialResponse.topic,
                            content: initialResponse.summary}}];
         const initialEdges = []
@@ -85,8 +87,7 @@ function Flow(){
                     type: 'topicNode',
                               position: {x: 400 * (index - Math.floor(initialResponse.subtopics.length/2)),
                                y: 700},
-                    width: 400,
-                    data: {addNode:addNode,
+                    data: {addNode: addNode,
                            title: item.topic,
                            content: item.description}})
           initialEdges.push({id: `edge-${id - 1}`,
@@ -115,10 +116,12 @@ function Flow(){
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
-      //onConnect={onConnect}
-    >
-      <Controls className="bg-white" />
-      <MiniMap />
+      minZoom={0.1}
+      panOnScroll
+  //onConnect={onConnect}
+  >
+  <Controls className="bg-white" />
+  <MiniMap />
     </ReactFlow>
     {!initialized && (
       <div className="absolute h-screen w-screen top-0 z-10 bg-zinc-800 flex justify-center items-center">

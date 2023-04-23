@@ -46,11 +46,8 @@ export function SummaryNode({id, data}) {
    const content = data.content
    return (
        <div className="relative">
-                <NodeResizeControl style={controlStyle}>
-                    <ResizeIcon/>
-                </NodeResizeControl>
-           <div className="h-full border border-2 border-black bg-white text-black rounded-xl">
-               <h2 className="border-b-2 border-black p-4">{data.title}</h2>
+           <div className="h-full w-[400px] border border-2 border-black bg-white text-black rounded-xl">
+               <h2 className="font-bold text-lg border-b-2 border-black p-4">{data.title}</h2>
                <div className="prose p-4 text-left max-w-max">
                    <ReactMarkdown>{content}</ReactMarkdown>
                </div>
@@ -68,25 +65,65 @@ export function SummaryNode({id, data}) {
 export function TopicNode({id, data}) {
 
     const topHandleId = `${id}-t`;
-    const autoHandleId = `${id}-b-l`;
-    const moreHandleId = `${id}-b-m`;
+    const divergeHandleId = `${id}-b-l`;
+    const convergeHandleId = `${id}-b-m`;
     const customHandleId = `${id}-b-r`;
+    const [divergeStatus, setDivergeStatus] = useState("ready")
+    const [convergeStatus, setConvergeStatus] = useState("ready")
 
     const onDivergeClicked = useCallback(() => {
-        data.addNode({addNode: data.addNode,
-                      type: 'topicNode',
-                      sourceId: id,
-                      xOffset: -850,
-                      yOffset: -300,
-                      handle: `l`})
+        setDivergeStatus("loading")
+        async function fetchData(topic) {
+             try {
+                 const response = await fetch(`/api/diverge?topic=${topic} ${data.content}`);
+                 const subtopicData = await response.json();
+                 console.log(subtopicData.choices[0].message.content)
+                 const subtopicResponse = subtopicData.choices[0].message.content;
+                 const subtopics = JSON.parse(subtopicResponse).subtopics
+                 subtopics.forEach((item, index) => {
+                     data.addNode({addNode: data.addNode,
+                                  type: 'topicNode',
+                                  sourceId: id,
+                                  xOffset: 400 * (index - Math.floor(subtopics.length/2)),
+                                  yOffset: 50,
+                                  handle: `l`,
+                                   title: item.topic,
+                                   content: item.description})
+                 });
+
+                 setDivergeStatus("done")
+             } catch (error) {
+                 console.error('Error fetching data:', error);
+                 setDivergeStatus("ready")
+             }
+        }
+        fetchData(data.title)
+
     },[data]);
     const onConvergeClicked = useCallback(() => {
-        data.addNode({addNode: data.addNode,
-                      sourceId: id,
-                      type: 'summaryNode',
-                      xOffset: 0,
-                      yOffset: 20,
-                      handle: `m`})
+        setConvergeStatus("loading")
+        console.log(data)
+        async function fetchData(topic) {
+             try {
+                 const response = await fetch(`/api/converge?topic=${data.content}`);
+                 const summaryData = await response.json();
+                 console.log(summaryData.choices[0].message.content)
+                 const summaryResponse = summaryData.choices[0].message.content;
+                 data.addNode({addNode: data.addNode,
+                               sourceId: id,
+                               type: 'summaryNode',
+                               xOffset: 0,
+                               yOffset: 30,
+                               handle: `m`,
+                               title: data.title,
+                               content: summaryResponse})
+                 setConvergeStatus("done")
+             } catch (error) {
+                 console.error('Error fetching data:', error);
+                 setConvergeStatus("ready")
+             }
+        }
+        fetchData(data.title)
     },[data]);
     const onCustomClicked = useCallback(() => {
         data.addNode({addNode: data.addNode,
@@ -105,15 +142,23 @@ export function TopicNode({id, data}) {
         return (
             <div className="relative">
                 <div className="h-full w-[400px] border border-2 border-black bg-white text-black rounded-xl">
-                    <h2 className="border-b-2 border-black p-4">{data.title}</h2>
+                    <h2 className="font-bold text-lg border-b-2 border-black p-4">{data.title}</h2>
                     <div className="prose p-4 text-left max-w-max">
                         <ReactMarkdown>{content}</ReactMarkdown>
                     </div>
                     <div className="flex flex-row">
-                        <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black hover:bg-gray-100 rounded-bl-xl"
-                                onClick={onDivergeClicked}>Explore Subtopics</button>
-                        <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black hover:bg-gray-100"
-                                onClick={onConvergeClicked}>Key Takeaways</button>
+                        <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black enabled:hover:bg-gray-100 rounded-bl-xl"
+                                disabled={divergeStatus !== "ready"}
+                                onClick={onDivergeClicked}>{divergeStatus === "loading" ? (
+                                        <span> Loading...</span>) : (
+                                            <span> Explore Subtopics </span>
+                                    )}</button>
+                        <button className="basis-1/3 p-4 border-t-2 border-r-2 border-black enabled:hover:bg-gray-100"
+                                disabled={convergeStatus !== "ready"}
+                                onClick={onConvergeClicked}>{convergeStatus === "loading" ? (
+                                        <span> Loading...</span>) : (
+                                            <span> Key Takeaways </span>
+                                    )}</button>
                         <button className="basis-1/3 p-4 border-t-2 border-black enabled:hover:bg-gray-100 disabled:text-gray-500 rounded-br-xl"
                                 disabled onClick={onCustomClicked}>Custom</button>
                     </div>
@@ -127,12 +172,12 @@ export function TopicNode({id, data}) {
                     type = "source"
                     position = {Position.Bottom}
                     style ={{left:60}}
-                    id = {autoHandleId}
+                    id = {divergeHandleId}
                 />
                 <Handle
                     type = "source"
                     position = {Position.Bottom}
-                    id = {moreHandleId}
+                    id = {convergeHandleId}
                 />
                 <Handle
                     type = "source"
