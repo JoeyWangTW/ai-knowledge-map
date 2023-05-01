@@ -25,7 +25,8 @@ function PromptModal({
   };
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onAddNode();
+    onAddNode({ title: prompt });
+    onSetShowModal(false);
   };
 
   return (
@@ -48,7 +49,7 @@ function PromptModal({
             <form onSubmit={handlePromptSubmit}>
               <textarea
                 placeholder="Type your text here..."
-                class="w-full resize-none border border-black rounded-xl px-2 py-1
+                className="w-full resize-none border border-black rounded-xl px-2 py-1
                                    text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-0
                                    mb-4"
                 rows="7"

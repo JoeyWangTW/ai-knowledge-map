@@ -13,28 +13,50 @@ import ReactFlow, {
 } from 'reactflow';
 import va from '@vercel/analytics';
 
+import useStore from "../whiteboard/store";
+import { shallow } from "zustand/shallow";
+
+const selector = (state) => ({
+    onUpdateNodeContent: state.onUpdateNodeContent
+});
+
+
 function ResizeIcon() {
-  return (
-      <div className="absolute right-4 bottom-20">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      strokeWidth="2"
-      stroke="#000000"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <polyline points="16 20 20 20 20 16" />
-      <line x1="14" y1="14" x2="20" y2="20" />
-      <polyline points="8 4 4 4 4 8" />
-      <line x1="4" y1="4" x2="10" y2="10" />
-    </svg>
-      </div>
-  );
+    return (
+        <div className="absolute right-4 bottom-20">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="#000000"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <polyline points="16 20 20 20 20 16" />
+                <line x1="14" y1="14" x2="20" y2="20" />
+                <polyline points="8 4 4 4 4 8" />
+                <line x1="4" y1="4" x2="10" y2="10" />
+            </svg>
+        </div>
+    );
+}
+
+export function UniversalNode({ id, data }: { id: string; data: { title: string; content: string }}) {
+
+    return (
+        <div className="relative">
+            <div className="h-full border border-2 border-black bg-white text-black rounded-xl">
+                <h2 className="font-bold text-lg border-b-2 border-black p-4">{data.title}</h2>
+                <div className="prose p-4 text-left max-w-max">
+                     <ReactMarkdown>{data.content}</ReactMarkdown>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 export function SummaryNode({ id, data }: { id: string; data: { title: string; content: string }}) {

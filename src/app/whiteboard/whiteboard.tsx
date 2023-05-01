@@ -16,6 +16,8 @@ import ReactFlow, {
 import useStore from "./store";
 import { shallow } from "zustand/shallow";
 import "reactflow/dist/style.css";
+import { UniversalNode } from "../graph/node";
+import React, { useMemo } from "react";
 
 const selector = (state) => ({
   nodes: state.nodes,
@@ -30,8 +32,20 @@ function Flow() {
     selector,
     shallow
   );
+
+  const nodeTypes: NodeTypes = useMemo(
+    () => ({ universalNode: UniversalNode }),
+    []
+  );
+
   return (
-    <ReactFlow nodes={nodes} edges={edges} fitView>
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      fitView
+      nodeTypes={nodeTypes}
+      onNodesChange={onNodesChange}
+    >
       <Controls className="bg-white" />
       <MiniMap />
     </ReactFlow>
