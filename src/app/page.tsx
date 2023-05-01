@@ -69,6 +69,10 @@ export default function Home() {
     router.push(`/graph?topic=${topic}`);
   };
 
+  const handleWhiteboard = () => {
+    router.push(`/whiteboard`);
+  };
+
   return (
     <main className="font-mono flex items-center justify-center w-screen h-screen flex-1 text-center bg-zinc-800 text-white">
       <Analytics />
@@ -84,11 +88,19 @@ export default function Home() {
           </div>
           <button
             type="submit"
+            onClick={handleTopicSubmit}
             className="w-96 rounded-xl border border-white p-4 hover:border-b-2 hover:border-r-2"
           >
             Create Knowledge Map
           </button>
         </form>
+
+        <button
+          onClick={handleWhiteboard}
+          className="w-96 rounded-xl border border-white p-4 hover:border-b-2 hover:border-r-2 mt-4"
+        >
+          Start from scratch
+        </button>
       </div>
     </main>
   );

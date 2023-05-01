@@ -23,18 +23,8 @@ type RFState = {
 
 // this is our useStore hook that we can use in our components to get parts of the store and call actions
 const useStore = create<RFState>((set, get) => ({
-  nodes: [{
-    id: '1',
-    type: 'input',
-    data: { label: 'Input' },
-    position: { x: 250, y: 25 },
-  },
-  {
-    id: '2',
-    data: { label: 'Default' },
-    position: { x: 100, y: 125 },
-  }],
-  edges: [{ id: 'e1-2', source: '1', target: '2' }],
+  nodes: [],
+  edges: [],
   onNodesChange: (changes: NodeChange[]) => {
     set({
       nodes: applyNodeChanges(changes, get().nodes),
@@ -50,6 +40,16 @@ const useStore = create<RFState>((set, get) => ({
       edges: addEdge(connection, get().edges),
     });
   },
+    onUpdateNodeContent: (nodeId: string, content: string) => {
+        set({
+            nodes: get().nodes.map((node) => {
+                if (node.id === nodeId){
+                    node.data = {...node.data, content}
+                }
+                return node;
+            })
+        })
+    },
 }));
 
 export default useStore;
