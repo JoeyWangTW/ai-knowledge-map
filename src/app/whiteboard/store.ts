@@ -14,12 +14,17 @@ import {
 } from 'reactflow';
 
 type RFState = {
-  nodes: Node[];
+    showModal: boolean;
+    onSetShowModal: (showModal: boolean) => void;
+    nodes: Node[];
   edges: Edge[];
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
 };
+
+let id = 1;
+const getId = () => `${id++}`;
 
 // this is our useStore hook that we can use in our components to get parts of the store and call actions
 const useStore = create<RFState>((set, get) => ({
@@ -50,6 +55,13 @@ const useStore = create<RFState>((set, get) => ({
             })
         })
     },
+    onAddNode: (title: string, sourceNodeId: string) => {
+       console.log("addNode")
+    },
+    showModal: true,
+    onSetShowModal: (showModal: boolean) => {
+    set({ showModal });
+  },
 }));
 
 export default useStore;
