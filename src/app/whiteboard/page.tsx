@@ -2,30 +2,27 @@
 
 import React, { useState } from "react";
 import Whiteboard from "./whiteboard";
-import useStore from "./store";
+import useStore, { RFState } from "../whiteboard/store";
 import { XMarkIcon, DocumentPlusIcon } from "@heroicons/react/24/outline";
 import { shallow } from "zustand/shallow";
 
-const selector = (state) => ({
+const selector = (state: RFState) => ({
   onAddNode: state.onAddNode,
   showModal: state.showModal,
   onSetShowModal: state.onSetShowModal,
 });
 
-function PromptModal({
-  setShowPromptModal,
-}: {
-  setShowPromptModal: () => void;
-}) {
+function PromptModal() {
   const { onAddNode, showModal, onSetShowModal } = useStore(selector, shallow);
 
   const [prompt, setPrompt] = useState("");
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
   };
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onAddNode({ title: prompt });
+    const sourceNodeId = "";
+    onAddNode({ title: prompt, sourceNodeId });
     onSetShowModal(false);
   };
 
@@ -52,7 +49,7 @@ function PromptModal({
                 className="w-full resize-none border border-black rounded-xl px-2 py-1
                                    text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-0
                                    mb-4"
-                rows="7"
+                rows={7}
                 onChange={handleInputChange}
               ></textarea>
               <button

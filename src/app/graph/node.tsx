@@ -13,10 +13,10 @@ import ReactFlow, {
 } from 'reactflow';
 import va from '@vercel/analytics';
 
-import useStore from "../whiteboard/store";
+import useStore, {RFState} from "../whiteboard/store";
 import { shallow } from "zustand/shallow";
 
-const selector = (state) => ({
+const selector = (state: RFState) => ({
     onUpdateNodeContent: state.onUpdateNodeContent
 });
 

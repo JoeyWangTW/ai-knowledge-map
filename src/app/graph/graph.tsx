@@ -148,7 +148,7 @@ function Flow(){
     </ReactFlow>
     {!pageInitialized && (
       <div className="absolute h-screen w-screen top-0 z-10 bg-zinc-800 flex justify-center items-center">
-        <div classname="w-5 h-5 object-center animate-spin bg-white"></div>
+        <div className="w-5 h-5 object-center animate-spin bg-white"></div>
       </div>
     )}
   </>

@@ -13,13 +13,13 @@ import ReactFlow, {
   Position,
   useNodesInitialized,
 } from "reactflow";
-import useStore from "./store";
+import useStore, { RFState } from "./store";
 import { shallow } from "zustand/shallow";
 import "reactflow/dist/style.css";
 import { UniversalNode } from "../graph/node";
 import React, { useMemo } from "react";
 
-const selector = (state) => ({
+const selector = (state: RFState) => ({
   nodes: state.nodes,
   edges: state.edges,
   onNodesChange: state.onNodesChange,

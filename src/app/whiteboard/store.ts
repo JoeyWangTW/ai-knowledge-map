@@ -13,7 +13,7 @@ import {
   applyEdgeChanges,
 } from "reactflow";
 
-type RFState = {
+export type RFState = {
   showModal: boolean;
   onSetShowModal: (showModal: boolean) => void;
   nodes: Node[];
@@ -28,6 +28,13 @@ type RFState = {
     nodeId: string;
     content: string;
   }) => void;
+  onAddNode: ({
+    title,
+    sourceNodeId,
+  }: {
+    title: string;
+    sourceNodeId: string;
+  }) => void;
 };
 
 const generateResponse = async ({
@@ -37,7 +44,13 @@ const generateResponse = async ({
 }: {
   id: string;
   prompt: string;
-  onUpdateNodeContent: ({ nodeId, content }) => void;
+  onUpdateNodeContent: ({
+    nodeId,
+    content,
+  }: {
+    nodeId: string;
+    content: string;
+  }) => void;
 }) => {
   const response = await fetch("/api/custom", {
     method: "POST",

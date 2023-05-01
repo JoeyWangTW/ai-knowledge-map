@@ -6,7 +6,19 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-export async function OpenAIStream(payload) {
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+// Define a type for payload
+type Payload = {
+  model: string;
+  messages: Message[];
+  stream: boolean;
+};
+
+export async function OpenAIStream(payload:Payload) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
@@ -22,7 +34,6 @@ export async function OpenAIStream(payload) {
     });
   */
 
-  console.log("Openai API", JSON.stringify(payload))
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
       "Content-Type": "application/json",
