@@ -45,6 +45,9 @@ function Flow() {
       fitView
       nodeTypes={nodeTypes}
       onNodesChange={onNodesChange}
+      onConnect={onConnect}
+      panOnScroll
+      connectionMode="loose"
     >
       <Controls className="bg-white" />
       <MiniMap />

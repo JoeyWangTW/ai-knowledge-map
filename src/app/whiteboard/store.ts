@@ -100,10 +100,13 @@ const useStore = create<RFState>((set, get) => ({
     });
   },
   onConnect: (connection: Connection) => {
-    set({
-      edges: addEdge(connection, get().edges),
-    });
-  },
+  if (!connection.sourceHandle || !connection.targetHandle) {
+    return;
+  }
+  set((state) => ({
+    edges: addEdge(connection, state.edges),
+  }));
+},
   onUpdateNodeContent: ({
     nodeId,
     content,
