@@ -11,6 +11,7 @@ import {
   OnConnect,
   applyNodeChanges,
   applyEdgeChanges,
+  MarkerType,
 } from "reactflow";
 
 export type RFState = {
@@ -21,13 +22,7 @@ export type RFState = {
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
-  importNodesAndEdges: ({
-    importedNodes,
-    importedEdges,
-  }: {
-    importedNodes: Node[];
-    importedEdges: Edge[];
-  }) => void;
+  importNodesAndEdges: (importedNodes: Node[], importedEdges: Edge[]) => void;
   onUpdateNodeContent: ({
     nodeId,
     content,
@@ -42,6 +37,7 @@ export type RFState = {
     title: string;
     sourceNodeId: string;
   }) => void;
+  onDeleteEdge: (id: string) => void;
 };
 
 const generateResponse = async ({
@@ -107,13 +103,31 @@ const useStore = create<RFState>((set, get) => ({
     });
   },
   onConnect: (connection: Connection) => {
+    // Check if the source and target handles exist in the connection object
+    if (!connection.sourceHandle || !connection.targetHandle) {
+      return;
+    }
+
+    // Add the custom edge to the state (use your state management method here)
+    set(({ edges }) => {
+      const customEdge = {
+        ...connection,
+        type: "customEdge",
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+        },
+      };
+      return { edges: [...edges, customEdge] };
+    });
+  },
+  /*onConnect: (connection: Connection) => {
     if (!connection.sourceHandle || !connection.targetHandle) {
       return;
     }
     set((state) => ({
       edges: addEdge(connection, state.edges),
     }));
-  },
+  },*/
   importNodesAndEdges: (importedNodes: Node[], importedEdges: Edge[]) => {
     set({ nodes: importedNodes, edges: importedEdges });
   },
@@ -168,6 +182,12 @@ const useStore = create<RFState>((set, get) => ({
   showModal: true,
   onSetShowModal: (showModal: boolean) => {
     set({ showModal });
+  },
+  onDeleteEdge: (id: string) => {
+    set((state) => {
+      const filteredEdges = state.edges.filter((edge) => edge.id !== id);
+      return { edges: filteredEdges };
+    });
   },
 }));
 

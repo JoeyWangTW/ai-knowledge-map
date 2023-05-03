@@ -9,6 +9,7 @@ import ReactFlow, {
   useReactFlow,
   Handle,
   NodeTypes,
+  EdgeTypes,
   NodeResizeControl,
   Position,
   useNodesInitialized,
@@ -17,6 +18,7 @@ import useStore, { RFState } from "./store";
 import { shallow } from "zustand/shallow";
 import "reactflow/dist/style.css";
 import { UniversalNode } from "../graph/node";
+import {CustomEdge} from "../edge";
 import React, { useMemo } from "react";
 
 const selector = (state: RFState) => ({
@@ -34,7 +36,11 @@ function Flow() {
   );
 
   const nodeTypes: NodeTypes = useMemo(
-    () => ({ universalNode: UniversalNode }),
+    () => ({ universalNode: UniversalNode}),
+    []
+  );
+  const edgeTypes: EdgeTypes = useMemo(
+    () => ({ customEdge: CustomEdge}),
     []
   );
 
@@ -44,6 +50,7 @@ function Flow() {
       edges={edges}
       fitView
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       onNodesChange={onNodesChange}
       onConnect={onConnect}
       panOnScroll
