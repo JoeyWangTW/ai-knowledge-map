@@ -1,15 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Whiteboard from "./whiteboard";
 import useStore, { RFState } from "../whiteboard/store";
-import { XMarkIcon, DocumentPlusIcon, ArrowDownOnSquareIcon, ArrowLeftOnRectangleIcon } from "@heroicons/react/24/outline";
+import {
+  XMarkIcon,
+  DocumentPlusIcon,
+  ArrowDownOnSquareIcon,
+  ArrowLeftOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 import { shallow } from "zustand/shallow";
+import { isNode, isEdge } from "reactflow";
 
 const selector = (state: RFState) => ({
+  nodes: state.nodes,
+  edges: state.edges,
   onAddNode: state.onAddNode,
   showModal: state.showModal,
   onSetShowModal: state.onSetShowModal,
+  importNodesAndEdges: state.importNodesAndEdges,
 });
 
 function PromptModal() {
@@ -77,7 +86,7 @@ function NewNodeButton() {
       }}
     >
       <div className="flex items-center ">
-        <DocumentPlusIcon className="h-10 w-10 p-2"/>
+        <DocumentPlusIcon className="h-10 w-10 p-2" />
         <span className="hidden group-hover:inline-block transform transition-all duration-200 ease-out pr-2">
           Add New Block
         </span>
@@ -87,34 +96,91 @@ function NewNodeButton() {
 }
 
 function ImportButton() {
+  const hiddenFileInput = useRef(null);
+  const { importNodesAndEdges } = useStore(selector, shallow);
+  const onImportButtonClicked = () => {
+    hiddenFileInput.current.click();
+  };
+
+  const onImport = async (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        console.log(importedData);
+        const importedNodes = importedData.nodes;
+        const importedEdges = importedData.edges;
+        if (
+          Array.isArray(importedNodes) &&
+          Array.isArray(importedEdges) &&
+          importedNodes.every((el) => isNode(el)) &&
+          importedEdges.every((el) => isEdge(el))
+        ) {
+          importNodesAndEdges(importedNodes, importedEdges);
+        } else {
+          alert(
+            "We couldn't import your data.\
+Ensure the file is in JSON format and has the correct structure for nodes and edges. \
+For help, check our documentation or contact support."
+          );
+          console.error("Invalid data format");
+        }
+      } catch (err) {
+        alert(
+          "We couldn't import your data.\
+Ensure the file is in JSON format and has the correct structure for nodes and edges. \
+For help, check our documentation or contact support."
+        );
+        console.error("Error parsing JSON:", err);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+  };
   return (
-    <button
-      className="group relative h-10 w-max text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full
-                 focus:outline-none transition-all duration-200 ease-out"
-      onClick={() => {
-        alert("export");
-      }}
-    >
-      <div className="flex items-center ">
-        <ArrowLeftOnRectangleIcon className="h-10 w-10 p-2"/>
-        <span className="hidden group-hover:inline-block transform transition-all duration-200 ease-out pr-2">
-          Import
-        </span>
-      </div>
-    </button>
+    <>
+      <button
+        className="group relative h-10 w-max text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full
+                   focus:outline-none transition-all duration-200 ease-out"
+        onClick={onImportButtonClicked}
+      >
+        <div className="flex items-center ">
+          <ArrowLeftOnRectangleIcon className="h-10 w-10 p-2" />
+          <span className="hidden group-hover:inline-block transform transition-all duration-200 ease-out pr-2">
+            Import
+          </span>
+        </div>
+      </button>
+      <input
+        type="file"
+        ref={hiddenFileInput}
+        accept=".json"
+        onChange={onImport}
+        className="hidden"
+      />
+    </>
   );
 }
 
 function ExportButton() {
+  const { nodes, edges } = useStore(selector, shallow);
+  const onExport = () => {
+    const serializedData = JSON.stringify({ nodes: nodes, edges: edges });
+    const blob = new Blob([serializedData], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "export.json";
+    link.click();
+  };
   return (
     <button
       className="group relative h-10 w-max text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none transition-all duration-200 ease-out"
-      onClick={() => {
-        alert("export");
-      }}
+      onClick={onExport}
     >
       <div className="flex items-center ">
-        <ArrowDownOnSquareIcon className="h-10 w-10 p-2"/>
+        <ArrowDownOnSquareIcon className="h-10 w-10 p-2" />
         <span className="hidden group-hover:inline-block transform transition-all duration-200 ease-out pr-2">
           Export
         </span>
@@ -123,15 +189,14 @@ function ExportButton() {
   );
 }
 
-
 export default function Home() {
   return (
     <main className="font-sans flex items-center justify-center w-screen h-screen flex-1 text-center relative">
       <Whiteboard />
       <PromptModal />
       <div className="absolute top-5 left-5 flex flex-col space-y-4">
-        <ImportButton/>
-        <ExportButton/>
+        <ImportButton />
+        <ExportButton />
         <NewNodeButton />
       </div>
     </main>

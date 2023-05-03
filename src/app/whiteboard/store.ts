@@ -21,6 +21,13 @@ export type RFState = {
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
+  importNodesAndEdges: ({
+    importedNodes,
+    importedEdges,
+  }: {
+    importedNodes: Node[];
+    importedEdges: Edge[];
+  }) => void;
   onUpdateNodeContent: ({
     nodeId,
     content,
@@ -100,13 +107,16 @@ const useStore = create<RFState>((set, get) => ({
     });
   },
   onConnect: (connection: Connection) => {
-  if (!connection.sourceHandle || !connection.targetHandle) {
-    return;
-  }
-  set((state) => ({
-    edges: addEdge(connection, state.edges),
-  }));
-},
+    if (!connection.sourceHandle || !connection.targetHandle) {
+      return;
+    }
+    set((state) => ({
+      edges: addEdge(connection, state.edges),
+    }));
+  },
+  importNodesAndEdges: (importedNodes: Node[], importedEdges: Edge[]) => {
+    set({ nodes: importedNodes, edges: importedEdges });
+  },
   onUpdateNodeContent: ({
     nodeId,
     content,
