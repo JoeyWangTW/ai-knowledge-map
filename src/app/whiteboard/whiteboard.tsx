@@ -1,3 +1,4 @@
+import React, { useMemo, ComponentType} from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -13,13 +14,14 @@ import ReactFlow, {
   NodeResizeControl,
   Position,
   useNodesInitialized,
+  EdgeProps,
+  ConnectionMode
 } from "reactflow";
 import useStore, { RFState } from "./store";
 import { shallow } from "zustand/shallow";
 import "reactflow/dist/style.css";
 import { UniversalNode } from "../graph/node";
-import {CustomEdge} from "../edge";
-import React, { useMemo } from "react";
+import {CustomEdge } from "../edge";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -39,6 +41,7 @@ function Flow() {
     () => ({ universalNode: UniversalNode}),
     []
   );
+
   const edgeTypes: EdgeTypes = useMemo(
     () => ({ customEdge: CustomEdge}),
     []
@@ -54,7 +57,7 @@ function Flow() {
       onNodesChange={onNodesChange}
       onConnect={onConnect}
       panOnScroll
-      connectionMode="loose"
+      connectionMode={ConnectionMode.Loose}
     >
       <Controls className="bg-white" />
       <MiniMap />

@@ -109,9 +109,14 @@ const useStore = create<RFState>((set, get) => ({
     }
 
     // Add the custom edge to the state (use your state management method here)
-    set(({ edges }) => {
-      const customEdge = {
+    set(({ edges }: RFState) => {
+      const customEdge: Edge = {
         ...connection,
+        source: connection.source || "",
+        target: connection.target || "",
+        sourceHandle: connection.sourceHandle || "",
+        targetHandle: connection.targetHandle || "",
+        id: `${connection.source}->${connection.target}`,
         type: "customEdge",
         markerEnd: {
           type: MarkerType.ArrowClosed,
@@ -120,14 +125,6 @@ const useStore = create<RFState>((set, get) => ({
       return { edges: [...edges, customEdge] };
     });
   },
-  /*onConnect: (connection: Connection) => {
-    if (!connection.sourceHandle || !connection.targetHandle) {
-      return;
-    }
-    set((state) => ({
-      edges: addEdge(connection, state.edges),
-    }));
-  },*/
   importNodesAndEdges: (importedNodes: Node[], importedEdges: Edge[]) => {
     set({ nodes: importedNodes, edges: importedEdges });
   },

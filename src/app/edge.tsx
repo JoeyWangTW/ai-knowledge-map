@@ -1,5 +1,11 @@
 import React from "react";
-import { getBezierPath, Position, MarkerType } from "reactflow";
+import {
+  getBezierPath,
+  Position,
+  MarkerType,
+  EdgeTypes,
+  EdgeProps,
+} from "reactflow";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import useStore, { RFState } from "./whiteboard/store";
 import { shallow } from "zustand/shallow";
@@ -8,17 +14,6 @@ const selector = (state: RFState) => ({
   onDeleteEdge: state.onDeleteEdge,
 });
 const foreignObjectSize = 40;
-
-interface CustomEdgeProps {
-  id: string;
-  sourceX: number;
-  sourceY: number;
-  targetX: number;
-  targetY: number;
-  sourcePosition: Position;
-  targetPosition: Position;
-  markerEnd: string;
-}
 
 export function CustomEdge({
   id,
@@ -29,7 +24,7 @@ export function CustomEdge({
   sourcePosition,
   targetPosition,
   markerEnd,
-}: CustomEdgeProps) {
+}: EdgeProps) {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,

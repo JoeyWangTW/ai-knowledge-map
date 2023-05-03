@@ -96,46 +96,53 @@ function NewNodeButton() {
 }
 
 function ImportButton() {
-  const hiddenFileInput = useRef(null);
+  const hiddenFileInput = useRef<HTMLInputElement>(null);
   const { importNodesAndEdges } = useStore(selector, shallow);
   const onImportButtonClicked = () => {
-    hiddenFileInput.current.click();
+    hiddenFileInput.current?.click();
   };
 
-  const onImport = async (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const importedData = JSON.parse(e.target.result);
-        console.log(importedData);
-        const importedNodes = importedData.nodes;
-        const importedEdges = importedData.edges;
-        if (
-          Array.isArray(importedNodes) &&
-          Array.isArray(importedEdges) &&
-          importedNodes.every((el) => isNode(el)) &&
-          importedEdges.every((el) => isEdge(el))
-        ) {
-          importNodesAndEdges(importedNodes, importedEdges);
-        } else {
-          alert(
-            "We couldn't import your data.\
+  const onImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target) {
+          try {
+            const importedData = JSON.parse(e.target.result as string);
+            console.log(importedData);
+            const importedNodes = importedData.nodes;
+            const importedEdges = importedData.edges;
+            if (
+              Array.isArray(importedNodes) &&
+              Array.isArray(importedEdges) &&
+              importedNodes.every((el) => isNode(el)) &&
+              importedEdges.every((el) => isEdge(el))
+            ) {
+              importNodesAndEdges(importedNodes, importedEdges);
+            } else {
+              alert(
+                "We couldn't import your data.\
 Ensure the file is in JSON format and has the correct structure for nodes and edges. \
 For help, check our documentation or contact support."
-          );
-          console.error("Invalid data format");
+              );
+              console.error("Invalid data format");
+            }
+          } catch (err) {
+            alert(
+              "We couldn't import your data.\
+Ensure the file is in JSON format and has the correct structure for nodes and edges. \
+For help, check our documentation or contact support."
+            );
+            console.error("Error parsing JSON:", err);
+          }
         }
-      } catch (err) {
-        alert(
-          "We couldn't import your data.\
-Ensure the file is in JSON format and has the correct structure for nodes and edges. \
-For help, check our documentation or contact support."
-        );
-        console.error("Error parsing JSON:", err);
-      }
-    };
-    reader.readAsText(file);
+      };
+      reader.readAsText(file);
+    } else {
+      alert("No files were provided");
+      console.error("No files were provided");
+    }
     event.target.value = "";
   };
   return (

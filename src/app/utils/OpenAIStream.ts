@@ -54,7 +54,6 @@ export async function OpenAIStream(payload:Payload) {
           }
           try {
             const json = JSON.parse(data);
-            console.log(json.choices[0].delta.content)
             const text = json.choices[0].delta.content;
             if (text){
 
