@@ -78,10 +78,30 @@ export function UniversalNode({
           <ReactMarkdown>{data.content}</ReactMarkdown>
         </div>
       </div>
-      <Handle type="source" id="top" position={Position.Top} />
-      <Handle type="source" id="left" position={Position.Left} />
-      <Handle type="source" id="right" position={Position.Right} />
-      <Handle type="source" id="bottom" position={Position.Bottom} />
+      <Handle
+        type="source"
+        id="top"
+        position={Position.Top}
+        className="w-3 h-3"
+      />
+      <Handle
+        type="source"
+        id="left"
+        position={Position.Left}
+        className="w-3 h-3"
+      />
+      <Handle
+        type="source"
+        id="right"
+        position={Position.Right}
+        className="w-3 h-3"
+      />
+      <Handle
+        type="source"
+        id="bottom"
+        position={Position.Bottom}
+        className="w-3 h-3"
+      />
     </>
   );
 }

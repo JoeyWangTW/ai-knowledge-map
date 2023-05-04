@@ -57,6 +57,7 @@ function Flow() {
       onNodesChange={onNodesChange}
       onConnect={onConnect}
       panOnScroll
+minZoom={0.1}
       connectionMode={ConnectionMode.Loose}
     >
       <Controls className="bg-white" />
