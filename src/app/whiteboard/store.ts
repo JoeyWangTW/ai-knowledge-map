@@ -165,11 +165,17 @@ const useStore = create<RFState>((set, get) => ({
   }) => {
     const newId = getId();
     set(({ nodes }) => {
+      const lastNode = nodes[nodes.length - 1];
+      const newNodeX = lastNode ? lastNode.position.x : 0;
+      const newNodeY = lastNode
+        ? lastNode.position.y + (lastNode.height ?? 0) + 50
+        : 0;
+      console.log(lastNode, newNodeX, newNodeY);
       const newNode = {
         id: newId,
         type: "universalNode",
         data: { title: title },
-        position: { x: 0, y: 0 },
+        position: { x: newNodeX, y: newNodeY },
       };
 
       return { nodes: nodes.concat(newNode) };
