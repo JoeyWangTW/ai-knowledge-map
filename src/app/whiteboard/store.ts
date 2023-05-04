@@ -33,9 +33,11 @@ export type RFState = {
   onAddNode: ({
     title,
     sourceNodeId,
+    markdownMode,
   }: {
     title: string;
     sourceNodeId: string;
+    markdownMode: boolean;
   }) => void;
   onDeleteEdge: (id: string) => void;
 };
@@ -155,9 +157,11 @@ const useStore = create<RFState>((set, get) => ({
   onAddNode: ({
     title,
     sourceNodeId,
+    markdownMode,
   }: {
     title: string;
     sourceNodeId: string;
+    markdownMode: boolean;
   }) => {
     const newId = getId();
     set(({ nodes }) => {
@@ -170,9 +174,10 @@ const useStore = create<RFState>((set, get) => ({
 
       return { nodes: nodes.concat(newNode) };
     });
+    const prompt = markdownMode ? `${title}\n\nWrite in markdown:` : title;
     generateResponse({
       id: newId,
-      prompt: title,
+      prompt: prompt,
       onUpdateNodeContent: get().onUpdateNodeContent,
     });
   },

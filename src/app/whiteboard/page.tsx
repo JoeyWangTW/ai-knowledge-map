@@ -25,13 +25,20 @@ function PromptModal() {
   const { onAddNode, showModal, onSetShowModal } = useStore(selector, shallow);
 
   const [prompt, setPrompt] = useState("");
+  const [markdownMode, setMarkdownMode] = useState(true);
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
   };
+
+  const handleMarkdownToggle = () => {
+    setMarkdownMode((prevMode) => !prevMode);
+  };
+
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const sourceNodeId = "";
-    onAddNode({ title: prompt, sourceNodeId });
+    onAddNode({ title: prompt, sourceNodeId, markdownMode });
+    setPrompt("");
     onSetShowModal(false);
   };
 
@@ -56,11 +63,24 @@ function PromptModal() {
               <textarea
                 placeholder="Type your text here..."
                 className="w-full resize-none border border-black rounded-xl px-2 py-1
-                                   text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-0
-                                   mb-4"
+                             text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-0
+                             mb-4"
                 rows={7}
+                value={prompt}
                 onChange={handleInputChange}
               ></textarea>
+              <div className="mb-2 flex items-center">
+                <label htmlFor="markdownToggle" className="mr-2">
+                  <span>Markdown Mode</span>
+                </label>
+                <input
+                  type="checkbox"
+                  id="markdownToggle"
+                  checked={markdownMode}
+                  onChange={handleMarkdownToggle}
+                  className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                />
+              </div>
               <button
                 type="submit"
                 className="rounded-xl border border-black p-4 hover:border-b-2 hover:border-r-2"
