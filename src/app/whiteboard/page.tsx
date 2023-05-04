@@ -8,6 +8,7 @@ import {
   DocumentPlusIcon,
   ArrowDownOnSquareIcon,
   ArrowLeftOnRectangleIcon,
+  QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
 import { shallow } from "zustand/shallow";
 import { isNode, isEdge } from "reactflow";
@@ -219,6 +220,21 @@ function ExportButton() {
   );
 }
 
+const SurveyButton = () => {
+  const openSurvey = () => {
+    window.open("https://forms.gle/pKy8LD7j3RpifwTT8", "_blank");
+  };
+
+  return (
+    <button
+      className="h-10 w-10 p-2 text-gray-200 hover:text-zinc-800 hover:bg-gray-200 rounded-full focus:outline-none"
+      onClick={openSurvey}
+    >
+      <QuestionMarkCircleIcon />
+    </button>
+  );
+};
+
 export default function Home() {
   return (
     <main className="font-sans flex items-center justify-center w-screen h-screen flex-1 text-center relative">
@@ -228,6 +244,9 @@ export default function Home() {
         <ImportButton />
         <ExportButton />
         <NewNodeButton />
+      </div>
+      <div className="absolute top-5 right-5">
+        <SurveyButton />
       </div>
     </main>
   );
