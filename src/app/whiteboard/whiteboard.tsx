@@ -15,7 +15,8 @@ import ReactFlow, {
   Position,
   useNodesInitialized,
   EdgeProps,
-  ConnectionMode
+  ConnectionMode,
+  Viewport
 } from "reactflow";
 import useStore, { RFState } from "./store";
 import { shallow } from "zustand/shallow";
@@ -47,17 +48,19 @@ function Flow() {
     []
   );
 
+  const defaultViewport: Viewport = { x: 100, y: 100, zoom: 0.7 }
+
   return (
     <ReactFlow
       nodes={nodes}
       edges={edges}
-      fitView
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       onNodesChange={onNodesChange}
       onConnect={onConnect}
+      defaultViewport={defaultViewport}
       panOnScroll
-minZoom={0.1}
+      minZoom={0.1}
       connectionMode={ConnectionMode.Loose}
     >
       <Controls className="bg-white" />
