@@ -59,7 +59,7 @@ function PromptModal() {
             >
               <XMarkIcon />
             </button>
-            <h1 className="font-bold text-xl mb-6">Enter Your Prompt</h1>
+            <h1 className="font-bold text-xl mb-6">Enter Prompt</h1>
             <form onSubmit={handlePromptSubmit}>
               <textarea
                 placeholder="Type your text here..."
