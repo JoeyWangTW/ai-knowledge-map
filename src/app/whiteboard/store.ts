@@ -170,7 +170,6 @@ const useStore = create<RFState>((set, get) => ({
       const newNodeY = lastNode
         ? lastNode.position.y + (lastNode.height ?? 0) + 50
         : 0;
-      console.log(lastNode, newNodeX, newNodeY);
       const newNode = {
         id: newId,
         type: "universalNode",
