@@ -2,7 +2,7 @@ import './globals.css'
 
 export const metadata = {
   title: 'AI Knowledge Map',
-  description: 'Learn with AI',
+  description: 'Transform your brainstorming with AI-powered diagrams',
 }
 
 export default function RootLayout({
