@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { shallow } from "zustand/shallow";
 import { isNode, isEdge } from "reactflow";
+import va from "@vercel/analytics";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -38,6 +39,7 @@ function PromptModal() {
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const sourceNodeId = "";
+    va.track("topic_submitted", { prompt: `${prompt}` });
     onAddNode({ title: prompt, sourceNodeId, markdownMode });
     setPrompt("");
     onSetShowModal(false);
@@ -141,6 +143,7 @@ function ImportButton() {
               importedNodes.every((el) => isNode(el)) &&
               importedEdges.every((el) => isEdge(el))
             ) {
+              va.track("graph_imported");
               importNodesAndEdges(importedNodes, importedEdges);
             } else {
               alert(
@@ -197,6 +200,7 @@ For help, check our documentation or contact support."
 function ExportButton() {
   const { nodes, edges } = useStore(selector, shallow);
   const onExport = () => {
+    va.track("graph_exported");
     const serializedData = JSON.stringify({ nodes: nodes, edges: edges });
     const blob = new Blob([serializedData], { type: "application/json" });
     const url = URL.createObjectURL(blob);

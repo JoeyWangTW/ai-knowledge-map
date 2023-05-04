@@ -18,6 +18,7 @@ export default function Home() {
   };
 
   const handleWhiteboard = () => {
+    va.track("start_clicked")
     router.push(`/whiteboard`);
   };
 
