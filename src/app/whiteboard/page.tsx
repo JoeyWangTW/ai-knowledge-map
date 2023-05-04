@@ -117,10 +117,11 @@ function NewNodeButton() {
 
 function ImportButton() {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
-  const { importNodesAndEdges } = useStore(selector, shallow);
+  const { importNodesAndEdges, nodes, edges } = useStore(selector, shallow);
   const onImportButtonClicked = () => {
     hiddenFileInput.current?.click();
   };
+  const graphExists = nodes.length !== 0 || edges.length !== 0;
 
   const onImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -169,13 +170,15 @@ For help, check our documentation or contact support."
     <>
       <button
         className="group relative h-10 w-max text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full
-                   focus:outline-none transition-all duration-200 ease-out"
+                   focus:outline-none transition-all duration-200 ease-out
+                   disabled:text-zinc-400"
         onClick={onImportButtonClicked}
+        disabled={graphExists}
       >
         <div className="flex items-center ">
           <ArrowLeftOnRectangleIcon className="h-10 w-10 p-2" />
           <span className="hidden group-hover:inline-block transform transition-all duration-200 ease-out pr-2">
-            Import
+            {graphExists ? "Import only allowed on empty graph" : "Import"}
           </span>
         </div>
       </button>
