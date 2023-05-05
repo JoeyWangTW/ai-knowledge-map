@@ -25,6 +25,7 @@ import { shallow } from "zustand/shallow";
 
 const selector = (state: RFState) => ({
   onUpdateNodeContent: state.onUpdateNodeContent,
+  setFollowUpModal: state.setFollowUpModal,
 });
 
 function ResizeIcon() {
@@ -59,6 +60,7 @@ export function UniversalNode({
   data: { title: string; content: string };
 }) {
   const [dragging, setDragging] = useState(false);
+  const { setFollowUpModal } = useStore(selector, shallow);
   return (
     <>
       <div
@@ -86,6 +88,7 @@ export function UniversalNode({
           opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
             dragging && "hidden"
           }`}
+          onClick={() => setFollowUpModal({ shown: true, sourceId: id })}
         >
           <PlusIcon />
         </button>

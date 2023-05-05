@@ -5,7 +5,6 @@ import {
   EdgeChange,
   Node,
   NodeChange,
-  addEdge,
   OnNodesChange,
   OnEdgesChange,
   OnConnect,
@@ -16,6 +15,14 @@ import {
 
 export type RFState = {
   showModal: boolean;
+  followUpModal: { shown: boolean; sourceId: string };
+  setFollowUpModal: ({
+    shown,
+    sourceId,
+  }: {
+    shown: boolean;
+    sourceId: string;
+  }) => void;
   onSetShowModal: (showModal: boolean) => void;
   nodes: Node[];
   edges: Edge[];
@@ -195,6 +202,16 @@ const useStore = create<RFState>((set, get) => ({
       const filteredEdges = state.edges.filter((edge) => edge.id !== id);
       return { edges: filteredEdges };
     });
+  },
+  followUpModal: { shown: false, sourceId: "" },
+  setFollowUpModal: ({
+    shown,
+    sourceId,
+  }: {
+    shown: boolean;
+    sourceId: string;
+  }) => {
+    set({ followUpModal: { shown: shown, sourceId: sourceId } });
   },
 }));
 
