@@ -19,13 +19,14 @@ import ReactFlow, {
   NodeResizer,
 } from "reactflow";
 import va from "@vercel/analytics";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import useStore, { RFState } from "../whiteboard/store";
 import { shallow } from "zustand/shallow";
 
 const selector = (state: RFState) => ({
   onUpdateNodeContent: state.onUpdateNodeContent,
   setFollowUpModal: state.setFollowUpModal,
+  onDeleteNode: state.onDeleteNode,
 });
 
 function ResizeIcon() {
@@ -60,7 +61,7 @@ export function UniversalNode({
   data: { title: string; content: string };
 }) {
   const [dragging, setDragging] = useState(false);
-  const { setFollowUpModal } = useStore(selector, shallow);
+  const { setFollowUpModal, onDeleteNode } = useStore(selector, shallow);
   return (
     <>
       <div
@@ -82,6 +83,20 @@ export function UniversalNode({
         <div className="prose py-4 px-6 text-left flex-1 overflow-auto max-w-max">
           <ReactMarkdown>{data.content}</ReactMarkdown>
         </div>
+        <button
+          className={`absolute top-3 right-3
+                      h-5 w-5 p-1 text-zinc-800 hover:bg-gray-200 rounded-full focus:outline-none
+                      opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                        dragging && "hidden"
+                      }`}
+          onClick={() => {
+            if (window.confirm("Are you sure you want to delete this block?")) {
+              onDeleteNode(id);
+            }
+          }}
+        >
+          <TrashIcon />
+        </button>
         <button
           className={`absolute top-1/2 -left-16 transform -translate-x-1/2 -translate-y-1/2
                              h-10 w-10 p-2 text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none

@@ -46,6 +46,7 @@ export type RFState = {
     title: string;
     markdownMode: boolean;
   }) => void;
+  onDeleteNode: (id: string) => void;
   onDeleteEdge: (id: string) => void;
   onAddFollowUpNode: ({
     title,
@@ -208,6 +209,15 @@ const useStore = create<RFState>((set, get) => ({
       markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
       context: [],
+    });
+  },
+  onDeleteNode: (id: string) => {
+    set(({ nodes, edges }) => {
+      const updatedNodes = nodes.filter((node) => node.id !== id);
+      const updatedEdges = edges.filter(
+        (edge) => edge.source !== id && edge.target !== id
+      );
+      return { nodes: updatedNodes, edges: updatedEdges };
     });
   },
   showModal: true,
