@@ -88,7 +88,13 @@ export function UniversalNode({
           opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
             dragging && "hidden"
           }`}
-          onClick={() => setFollowUpModal({ shown: true, sourceId: id })}
+          onClick={() =>
+            setFollowUpModal({
+              shown: true,
+              sourceId: id,
+              sourceHandle: "left",
+            })
+          }
         >
           <PlusIcon />
         </button>
@@ -98,6 +104,9 @@ export function UniversalNode({
                              opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                                dragging && "hidden"
                              }`}
+          onClick={() =>
+            setFollowUpModal({ shown: true, sourceId: id, sourceHandle: "top" })
+          }
         >
           <PlusIcon />
         </button>
@@ -107,6 +116,13 @@ export function UniversalNode({
                              opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                                dragging && "hidden"
                              }`}
+          onClick={() =>
+            setFollowUpModal({
+              shown: true,
+              sourceId: id,
+              sourceHandle: "right",
+            })
+          }
         >
           <PlusIcon />
         </button>
@@ -116,6 +132,13 @@ export function UniversalNode({
                              opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                                dragging && "hidden"
                              }`}
+          onClick={() =>
+            setFollowUpModal({
+              shown: true,
+              sourceId: id,
+              sourceHandle: "bottom",
+            })
+          }
         >
           <PlusIcon />
         </button>

@@ -15,13 +15,15 @@ import {
 
 export type RFState = {
   showModal: boolean;
-  followUpModal: { shown: boolean; sourceId: string };
+  followUpModal: { shown: boolean; sourceId: string; sourceHandle: string };
   setFollowUpModal: ({
     shown,
     sourceId,
+    sourceHandle,
   }: {
     shown: boolean;
     sourceId: string;
+    sourceHandle: string;
   }) => void;
   onSetShowModal: (showModal: boolean) => void;
   nodes: Node[];
@@ -48,10 +50,12 @@ export type RFState = {
   onAddFollowUpNode: ({
     title,
     sourceId,
+    sourceHandle,
     markdownMode,
   }: {
     title: string;
     sourceId: string;
+    sourceHandle: string;
     markdownMode: boolean;
   }) => void;
 };
@@ -209,23 +213,33 @@ const useStore = create<RFState>((set, get) => ({
       return { edges: filteredEdges };
     });
   },
-  followUpModal: { shown: false, sourceId: "" },
+  followUpModal: { shown: false, sourceId: "", sourceHandle: "" },
   setFollowUpModal: ({
     shown,
     sourceId,
+    sourceHandle,
   }: {
     shown: boolean;
     sourceId: string;
+    sourceHandle: string;
   }) => {
-    set({ followUpModal: { shown: shown, sourceId: sourceId } });
+    set({
+      followUpModal: {
+        shown: shown,
+        sourceId: sourceId,
+        sourceHandle: sourceHandle,
+      },
+    });
   },
   onAddFollowUpNode: ({
     title,
     sourceId,
+    sourceHandle,
     markdownMode,
   }: {
     title: string;
     sourceId: string;
+    sourceHandle: string;
     markdownMode: boolean;
   }) => {
     const newId = getId();
@@ -236,8 +250,7 @@ const useStore = create<RFState>((set, get) => ({
       console.error("Source node not found!");
       return;
     }
-
-    set(({ nodes }) => {
+    set(({ nodes, edges }) => {
       const newNodeX = sourceNode.position.x;
       const newNodeY = sourceNode.position.y + (sourceNode.height ?? 0) + 50;
       const newNode = {
@@ -247,7 +260,15 @@ const useStore = create<RFState>((set, get) => ({
         position: { x: newNodeX, y: newNodeY },
       };
 
-      return { nodes: nodes.concat(newNode) };
+      const newEdge = {
+        id: `${sourceId}->${newId}`,
+        source: sourceId,
+        target: newId,
+        sourceHandle: sourceHandle,
+        targetHandle: "top",
+      };
+
+      return { nodes: nodes.concat(newNode), edges: edges.concat(newEdge) };
     });
 
     const sourceNodeTitle = sourceNode.data.title;

@@ -119,11 +119,15 @@ function FollowUpModal() {
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const sourceId = followUpModal.sourceId;
     va.track("followup_submitted", { prompt: `${prompt}` });
-    onAddFollowUpNode({ title: prompt, sourceId, markdownMode });
+    onAddFollowUpNode({
+      title: prompt,
+      sourceId: followUpModal.sourceId,
+      markdownMode,
+      sourceHandle: followUpModal.sourceHandle,
+    });
     setPrompt("");
-    setFollowUpModal({ shown: false, souceId: "" });
+    setFollowUpModal({ shown: false, souceId: "", souceHandle: "" });
   };
 
   return (
@@ -137,7 +141,11 @@ function FollowUpModal() {
             <button
               className="absolute top-1 right-1 h-10 w-10 hover:bg-gray-200 rounded-full p-2"
               onClick={() => {
-                setFollowUpModal({ shown: false, souceId: "" });
+                setFollowUpModal({
+                  shown: false,
+                  souceId: "",
+                  souceHandle: "",
+                });
               }}
             >
               <XMarkIcon />
