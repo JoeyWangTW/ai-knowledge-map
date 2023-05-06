@@ -19,7 +19,7 @@ import ReactFlow, {
   NodeResizer,
 } from "reactflow";
 import va from "@vercel/analytics";
-import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, TrashIcon, LinkIcon } from "@heroicons/react/24/outline";
 import useStore, { RFState } from "../whiteboard/store";
 import { shallow } from "zustand/shallow";
 
@@ -65,15 +65,15 @@ export function UniversalNode({
   return (
     <>
       <div
-        className="relative h-full w-full border border-2 border-black bg-white
-                         text-black rounded-xl flex flex-col group"
+        className="group relative h-full w-full border border-2 border-black bg-white
+                         text-black rounded-xl flex flex-col "
       >
         <NodeResizeControl
           minWidth={100}
           minHeight={100}
           onResizeStart={() => setDragging(true)}
           onResizeEnd={() => setDragging(false)}
-          className="group-hover:opacity-100 opacity-0 bg-transparent border-none transition-opacity duration-300"
+          className="group-hover:opacity-100 opacity-0 bg-transparent border-none transition-opacity duration-200 w-0 h-0 border-none"
         >
           <ResizeIcon />
         </NodeResizeControl>
@@ -86,7 +86,7 @@ export function UniversalNode({
         <button
           className={`absolute top-3 right-3
                       h-5 w-5 p-1 text-zinc-800 hover:bg-gray-200 rounded-full focus:outline-none
-                      opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                      opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
                         dragging && "hidden"
                       }`}
           onClick={() => {
@@ -98,53 +98,10 @@ export function UniversalNode({
           <TrashIcon />
         </button>
         <button
-          className={`absolute top-1/2 -left-16 transform -translate-x-1/2 -translate-y-1/2
-                             h-10 w-10 p-2 text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none
-          opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-            dragging && "hidden"
-          }`}
-          onClick={() =>
-            setFollowUpModal({
-              shown: true,
-              sourceId: id,
-              sourceHandle: "left",
-            })
-          }
-        >
-          <PlusIcon />
-        </button>
-        <button
-          className={`absolute -top-12 right-1/2 transform translate-x-1/2 -translate-y-1/2
-                             h-10 w-10 p-2 text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none
-                             opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                               dragging && "hidden"
-                             }`}
-          onClick={() =>
-            setFollowUpModal({ shown: true, sourceId: id, sourceHandle: "top" })
-          }
-        >
-          <PlusIcon />
-        </button>
-        <button
-          className={`absolute top-1/2 -right-16 transform translate-x-1/2 -translate-y-1/2
-                             h-10 w-10 p-2 text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none
-                             opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                               dragging && "hidden"
-                             }`}
-          onClick={() =>
-            setFollowUpModal({
-              shown: true,
-              sourceId: id,
-              sourceHandle: "right",
-            })
-          }
-        >
-          <PlusIcon />
-        </button>
-        <button
-          className={`absolute -bottom-12 left-1/2 transform -translate-x-1/2 translate-y-1/2
-                             h-10 w-10 p-2 text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none
-                             opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+          className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2
+                        border border-1 border-black hover:scale-125 transform
+                             h-10 w-10 p-2 text-zinc-800 bg-white rounded-full focus:outline-none
+                             opacity-0 group-hover:opacity-100 transition duration-200 ease-in-out ${
                                dragging && "hidden"
                              }`}
           onClick={() =>
@@ -157,31 +114,16 @@ export function UniversalNode({
         >
           <PlusIcon />
         </button>
+
+        <Handle
+          type="source"
+          id="top"
+          position={Position.Top}
+          className="-m-1 w-4 h-4 p-2 opacity-0 group-hover:opacity-100 text-white transition-opacity duration-200"
+        >
+          <LinkIcon className="-m-1" />
+        </Handle>
       </div>
-      <Handle
-        type="source"
-        id="top"
-        position={Position.Top}
-        className="w-3 h-3"
-      />
-      <Handle
-        type="source"
-        id="left"
-        position={Position.Left}
-        className="w-3 h-3"
-      />
-      <Handle
-        type="source"
-        id="right"
-        position={Position.Right}
-        className="w-3 h-3"
-      />
-      <Handle
-        type="source"
-        id="bottom"
-        position={Position.Bottom}
-        className="w-3 h-3"
-      />
     </>
   );
 }
