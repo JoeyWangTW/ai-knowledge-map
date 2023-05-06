@@ -64,9 +64,12 @@ const generateResponse = async ({
   id,
   prompt,
   onUpdateNodeContent,
+  markdownMode,
+  context,
 }: {
   id: string;
   prompt: string;
+  markdownMode: boolean;
   onUpdateNodeContent: ({
     nodeId,
     content,
@@ -74,6 +77,7 @@ const generateResponse = async ({
     nodeId: string;
     content: string;
   }) => void;
+  context: Array<{ user: string; assistant: string }>;
 }) => {
   const response = await fetch("/api/custom", {
     method: "POST",
@@ -81,7 +85,9 @@ const generateResponse = async ({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      markdownMode,
       prompt,
+      context,
     }),
   });
 
@@ -196,11 +202,13 @@ const useStore = create<RFState>((set, get) => ({
 
       return { nodes: nodes.concat(newNode) };
     });
-    const prompt = markdownMode ? `${title}\n\nWrite in markdown:` : title;
+    const prompt = title;
     generateResponse({
       id: newId,
       prompt: prompt,
+      markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
+      context: [],
     });
   },
   showModal: true,
@@ -260,7 +268,7 @@ const useStore = create<RFState>((set, get) => ({
         case "bottom":
           return {
             x: sourceNodePosition.x,
-            y: sourceNodePosition.y + sourceNodeHeight + 50,
+            y: sourceNodePosition.y + sourceNodeHeight + 100,
           };
         case "top":
           return { x: sourceNodePosition.x, y: sourceNodePosition.y - 500 };
@@ -268,7 +276,7 @@ const useStore = create<RFState>((set, get) => ({
           return { x: sourceNodePosition.x - 500, y: sourceNodePosition.y };
         case "right":
           return {
-            x: sourceNodePosition.x + sourceNodeWidth + 50,
+            x: sourceNodePosition.x + sourceNodeWidth + 100,
             y: sourceNodePosition.y,
           };
         default:
@@ -295,8 +303,12 @@ const useStore = create<RFState>((set, get) => ({
         id: `e-${sourceId}-${newId}`,
         source: sourceId,
         target: newId,
+        type: "customEdge",
         sourceHandle: sourceHandle,
         targetHandle: targetHandle,
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+        },
       };
 
       return { nodes: nodes.concat(newNode), edges: edges.concat(newEdge) };
@@ -304,15 +316,15 @@ const useStore = create<RFState>((set, get) => ({
 
     const sourceNodeTitle = sourceNode.data.title;
     const sourceNodeContent = sourceNode.data.content;
-    const followUpPrompt = `${sourceNodeTitle}\n${sourceNodeContent}\n\n${title}`;
-    const prompt = markdownMode
-      ? `${followUpPrompt}\n\nWrite in markdown:`
-      : followUpPrompt;
+    const followUpPrompt = title;
+    const prompt = followUpPrompt;
 
     generateResponse({
       id: newId,
       prompt: prompt,
+      markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
+      context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
     });
   },
 }));
