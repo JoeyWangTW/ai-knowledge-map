@@ -250,22 +250,53 @@ const useStore = create<RFState>((set, get) => ({
       console.error("Source node not found!");
       return;
     }
+
+    const newPosition = (() => {
+      const sourceNodePosition = sourceNode.position;
+      const sourceNodeHeight = sourceNode.height ?? 0;
+      const sourceNodeWidth = sourceNode.width ?? 0;
+
+      switch (sourceHandle) {
+        case "bottom":
+          return {
+            x: sourceNodePosition.x,
+            y: sourceNodePosition.y + sourceNodeHeight + 50,
+          };
+        case "top":
+          return { x: sourceNodePosition.x, y: sourceNodePosition.y - 500 };
+        case "left":
+          return { x: sourceNodePosition.x - 500, y: sourceNodePosition.y };
+        case "right":
+          return {
+            x: sourceNodePosition.x + sourceNodeWidth + 50,
+            y: sourceNodePosition.y,
+          };
+        default:
+          return sourceNodePosition;
+      }
+    })();
+
     set(({ nodes, edges }) => {
-      const newNodeX = sourceNode.position.x;
-      const newNodeY = sourceNode.position.y + (sourceNode.height ?? 0) + 50;
       const newNode = {
         id: newId,
         type: "universalNode",
         data: { title: title },
-        position: { x: newNodeX, y: newNodeY },
+        position: newPosition,
       };
 
+      const targetHandle = {
+        bottom: "top",
+        top: "bottom",
+        left: "right",
+        right: "left",
+      }[sourceHandle];
+
       const newEdge = {
-        id: `${sourceId}->${newId}`,
+        id: `e-${sourceId}-${newId}`,
         source: sourceId,
         target: newId,
         sourceHandle: sourceHandle,
-        targetHandle: "top",
+        targetHandle: targetHandle,
       };
 
       return { nodes: nodes.concat(newNode), edges: edges.concat(newEdge) };
