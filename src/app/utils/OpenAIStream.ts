@@ -7,7 +7,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 type Message = {
-  role: "user" | "assistant" | "system";
+  role: string;
   content: string;
 };
 

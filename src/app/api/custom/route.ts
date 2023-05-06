@@ -14,16 +14,13 @@ export async function POST(req: Request) {
   const messages = context
     ? [
         ...context.map((entry) => [
-          { role: "user" as "user" | "assistant" | "system", content: entry.user },
-          { role: "assistant" as "user" | "assistant" | "system", content: entry.assistant },
+          { role: "user" || "user", content: entry.user },
+          { role: "assistant" || "user", content: entry.assistant },
         ]),
-        { role: "user" as "user" | "assistant" | "system", content: prompt || "" },
-        markdownMode ? { role: "system" as "user" | "assistant" | "system", content: "Markdown" } : null,
+        { role: "user" || "user", content: prompt || "" },
+        ...(markdownMode ? [{ role: "system", content: "" }] : []),
       ].flat()
-    : [
-        { role: "user" as "user" | "assistant", content: prompt || "" },
-        markdownMode ? { role: "system" as "user" | "assistant" | "system", content: "Markdown" } : null,
-      ].filter((msg) => msg !== null);
+    : [{ role: "user" || "", content: prompt || "" }];
 
   console.log(messages)
   const payload = {

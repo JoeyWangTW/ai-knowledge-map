@@ -183,7 +183,6 @@ const useStore = create<RFState>((set, get) => ({
     markdownMode,
   }: {
     title: string;
-    sourceNodeId: string;
     markdownMode: boolean;
   }) => {
     const newId = getId();

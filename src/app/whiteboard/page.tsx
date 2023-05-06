@@ -41,9 +41,8 @@ function PromptModal() {
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const sourceNodeId = "";
     va.track("topic_submitted", { prompt: `${prompt}` });
-    onAddNode({ title: prompt, sourceNodeId, markdownMode });
+    onAddNode({ title: prompt, markdownMode });
     setPrompt("");
     onSetShowModal(false);
   };
@@ -114,7 +113,7 @@ function FollowUpModal() {
   };
 
   const handleMarkdownToggle = () => {
-    setMarkdownModal((prevMode) => !prevMode);
+    setMarkdownMode((prevMode) => !prevMode);
   };
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -127,7 +126,7 @@ function FollowUpModal() {
       sourceHandle: followUpModal.sourceHandle,
     });
     setPrompt("");
-    setFollowUpModal({ shown: false, souceId: "", souceHandle: "" });
+    setFollowUpModal({ shown: false, sourceId: "", sourceHandle: "" });
   };
 
   return (
@@ -143,8 +142,8 @@ function FollowUpModal() {
               onClick={() => {
                 setFollowUpModal({
                   shown: false,
-                  souceId: "",
-                  souceHandle: "",
+                  sourceId: "",
+                  sourceHandle: "",
                 });
               }}
             >
