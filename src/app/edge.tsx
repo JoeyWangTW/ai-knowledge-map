@@ -9,31 +9,36 @@ import {
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import useStore, { RFState } from "./whiteboard/store";
 import { shallow } from "zustand/shallow";
+import { getEdgeParams } from "./utils/utils";
 
 const selector = (state: RFState) => ({
   onDeleteEdge: state.onDeleteEdge,
+  nodes: state.nodes,
 });
 const foreignObjectSize = 40;
 
-export function CustomEdge({
-  id,
-  sourceX,
-  sourceY,
-  targetX,
-  targetY,
-  sourcePosition,
-  targetPosition,
-  markerEnd,
-}: EdgeProps) {
+export function CustomEdge({ id, source, target, markerEnd }: EdgeProps) {
+  const { onDeleteEdge, nodes } = useStore(selector, shallow);
+  const sourceNode = nodes.find((item) => item.id === source);
+  const targetNode = nodes.find((item) => item.id === target);
+
+  if (!sourceNode || !targetNode) {
+    return null;
+  }
+
+  const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams(
+    sourceNode,
+    targetNode
+  );
+
   const [edgePath, labelX, labelY] = getBezierPath({
-    sourceX,
-    sourceY,
-    sourcePosition,
-    targetX,
-    targetY,
-    targetPosition,
+    sourceX: sx,
+    sourceY: sy,
+    sourcePosition: sourcePos,
+    targetPosition: targetPos,
+    targetX: tx,
+    targetY: ty,
   });
-  const { onDeleteEdge } = useStore(selector, shallow);
   const onEdgeClick = (evt: React.MouseEvent, id: string) => {
     evt.stopPropagation();
     onDeleteEdge(id);

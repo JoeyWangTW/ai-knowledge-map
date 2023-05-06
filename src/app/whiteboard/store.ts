@@ -141,8 +141,6 @@ const useStore = create<RFState>((set, get) => ({
         ...connection,
         source: connection.source || "",
         target: connection.target || "",
-        sourceHandle: connection.sourceHandle || "",
-        targetHandle: connection.targetHandle || "",
         id: `${connection.source}->${connection.target}`,
         type: "customEdge",
         markerEnd: {

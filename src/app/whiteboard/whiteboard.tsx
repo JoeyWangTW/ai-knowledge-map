@@ -63,8 +63,8 @@ function Flow() {
       minZoom={0.1}
       connectionMode={ConnectionMode.Loose}
     >
-      <Controls className="bg-white" />
-      <MiniMap />
+      <Controls className="bg-white hidden md:block" />
+      <MiniMap className="hidden md:block" />
     </ReactFlow>
   );
 }
