@@ -19,12 +19,13 @@ import ReactFlow, {
   NodeResizer,
 } from "reactflow";
 import va from "@vercel/analytics";
-
+import { PlusIcon } from "@heroicons/react/24/outline";
 import useStore, { RFState } from "../whiteboard/store";
 import { shallow } from "zustand/shallow";
 
 const selector = (state: RFState) => ({
   onUpdateNodeContent: state.onUpdateNodeContent,
+  setFollowUpModal: state.setFollowUpModal,
 });
 
 function ResizeIcon() {
@@ -58,16 +59,20 @@ export function UniversalNode({
   id: string;
   data: { title: string; content: string };
 }) {
+  const [dragging, setDragging] = useState(false);
+  const { setFollowUpModal } = useStore(selector, shallow);
   return (
     <>
       <div
         className="relative h-full w-full border border-2 border-black bg-white
-                          text-black rounded-xl flex flex-col group"
+                         text-black rounded-xl flex flex-col group"
       >
         <NodeResizeControl
           minWidth={100}
           minHeight={100}
-          className="group-hover:opacity-100 opacity-0 bg-transparent border-none"
+          onResizeStart={() => setDragging(true)}
+          onResizeEnd={() => setDragging(false)}
+          className="group-hover:opacity-100 opacity-0 bg-transparent border-none transition-opacity duration-300"
         >
           <ResizeIcon />
         </NodeResizeControl>
@@ -77,6 +82,66 @@ export function UniversalNode({
         <div className="prose py-4 px-6 text-left flex-1 overflow-auto max-w-max">
           <ReactMarkdown>{data.content}</ReactMarkdown>
         </div>
+        <button
+          className={`absolute top-1/2 -left-16 transform -translate-x-1/2 -translate-y-1/2
+                             h-10 w-10 p-2 text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none
+          opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+            dragging && "hidden"
+          }`}
+          onClick={() =>
+            setFollowUpModal({
+              shown: true,
+              sourceId: id,
+              sourceHandle: "left",
+            })
+          }
+        >
+          <PlusIcon />
+        </button>
+        <button
+          className={`absolute -top-12 right-1/2 transform translate-x-1/2 -translate-y-1/2
+                             h-10 w-10 p-2 text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none
+                             opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                               dragging && "hidden"
+                             }`}
+          onClick={() =>
+            setFollowUpModal({ shown: true, sourceId: id, sourceHandle: "top" })
+          }
+        >
+          <PlusIcon />
+        </button>
+        <button
+          className={`absolute top-1/2 -right-16 transform translate-x-1/2 -translate-y-1/2
+                             h-10 w-10 p-2 text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none
+                             opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                               dragging && "hidden"
+                             }`}
+          onClick={() =>
+            setFollowUpModal({
+              shown: true,
+              sourceId: id,
+              sourceHandle: "right",
+            })
+          }
+        >
+          <PlusIcon />
+        </button>
+        <button
+          className={`absolute -bottom-12 left-1/2 transform -translate-x-1/2 translate-y-1/2
+                             h-10 w-10 p-2 text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full focus:outline-none
+                             opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                               dragging && "hidden"
+                             }`}
+          onClick={() =>
+            setFollowUpModal({
+              shown: true,
+              sourceId: id,
+              sourceHandle: "bottom",
+            })
+          }
+        >
+          <PlusIcon />
+        </button>
       </div>
       <Handle
         type="source"

@@ -5,7 +5,6 @@ import {
   EdgeChange,
   Node,
   NodeChange,
-  addEdge,
   OnNodesChange,
   OnEdgesChange,
   OnConnect,
@@ -16,6 +15,16 @@ import {
 
 export type RFState = {
   showModal: boolean;
+  followUpModal: { shown: boolean; sourceId: string; sourceHandle: string };
+  setFollowUpModal: ({
+    shown,
+    sourceId,
+    sourceHandle,
+  }: {
+    shown: boolean;
+    sourceId: string;
+    sourceHandle: string;
+  }) => void;
   onSetShowModal: (showModal: boolean) => void;
   nodes: Node[];
   edges: Edge[];
@@ -32,23 +41,35 @@ export type RFState = {
   }) => void;
   onAddNode: ({
     title,
-    sourceNodeId,
     markdownMode,
   }: {
     title: string;
-    sourceNodeId: string;
     markdownMode: boolean;
   }) => void;
   onDeleteEdge: (id: string) => void;
+  onAddFollowUpNode: ({
+    title,
+    sourceId,
+    sourceHandle,
+    markdownMode,
+  }: {
+    title: string;
+    sourceId: string;
+    sourceHandle: string;
+    markdownMode: boolean;
+  }) => void;
 };
 
 const generateResponse = async ({
   id,
   prompt,
   onUpdateNodeContent,
+  markdownMode,
+  context,
 }: {
   id: string;
   prompt: string;
+  markdownMode: boolean;
   onUpdateNodeContent: ({
     nodeId,
     content,
@@ -56,6 +77,7 @@ const generateResponse = async ({
     nodeId: string;
     content: string;
   }) => void;
+  context: Array<{ user: string; assistant: string }>;
 }) => {
   const response = await fetch("/api/custom", {
     method: "POST",
@@ -63,7 +85,9 @@ const generateResponse = async ({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      markdownMode,
       prompt,
+      context,
     }),
   });
 
@@ -156,11 +180,9 @@ const useStore = create<RFState>((set, get) => ({
   },
   onAddNode: ({
     title,
-    sourceNodeId,
     markdownMode,
   }: {
     title: string;
-    sourceNodeId: string;
     markdownMode: boolean;
   }) => {
     const newId = getId();
@@ -179,11 +201,13 @@ const useStore = create<RFState>((set, get) => ({
 
       return { nodes: nodes.concat(newNode) };
     });
-    const prompt = markdownMode ? `${title}\n\nWrite in markdown:` : title;
+    const prompt = title;
     generateResponse({
       id: newId,
       prompt: prompt,
+      markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
+      context: [],
     });
   },
   showModal: true,
@@ -194,6 +218,112 @@ const useStore = create<RFState>((set, get) => ({
     set((state) => {
       const filteredEdges = state.edges.filter((edge) => edge.id !== id);
       return { edges: filteredEdges };
+    });
+  },
+  followUpModal: { shown: false, sourceId: "", sourceHandle: "" },
+  setFollowUpModal: ({
+    shown,
+    sourceId,
+    sourceHandle,
+  }: {
+    shown: boolean;
+    sourceId: string;
+    sourceHandle: string;
+  }) => {
+    set({
+      followUpModal: {
+        shown: shown,
+        sourceId: sourceId,
+        sourceHandle: sourceHandle,
+      },
+    });
+  },
+  onAddFollowUpNode: ({
+    title,
+    sourceId,
+    sourceHandle,
+    markdownMode,
+  }: {
+    title: string;
+    sourceId: string;
+    sourceHandle: string;
+    markdownMode: boolean;
+  }) => {
+    const newId = getId();
+
+    const sourceNode = get().nodes.find((node) => node.id === sourceId);
+
+    if (!sourceNode) {
+      console.error("Source node not found!");
+      return;
+    }
+
+    const newPosition = (() => {
+      const sourceNodePosition = sourceNode.position;
+      const sourceNodeHeight = sourceNode.height ?? 0;
+      const sourceNodeWidth = sourceNode.width ?? 0;
+
+      switch (sourceHandle) {
+        case "bottom":
+          return {
+            x: sourceNodePosition.x,
+            y: sourceNodePosition.y + sourceNodeHeight + 100,
+          };
+        case "top":
+          return { x: sourceNodePosition.x, y: sourceNodePosition.y - 500 };
+        case "left":
+          return { x: sourceNodePosition.x - 500, y: sourceNodePosition.y };
+        case "right":
+          return {
+            x: sourceNodePosition.x + sourceNodeWidth + 100,
+            y: sourceNodePosition.y,
+          };
+        default:
+          return sourceNodePosition;
+      }
+    })();
+
+    set(({ nodes, edges }) => {
+      const newNode = {
+        id: newId,
+        type: "universalNode",
+        data: { title: title },
+        position: newPosition,
+      };
+
+      const targetHandle = {
+        bottom: "top",
+        top: "bottom",
+        left: "right",
+        right: "left",
+      }[sourceHandle];
+
+      const newEdge = {
+        id: `e-${sourceId}-${newId}`,
+        source: sourceId,
+        target: newId,
+        type: "customEdge",
+        sourceHandle: sourceHandle,
+        targetHandle: targetHandle,
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+        },
+      };
+
+      return { nodes: nodes.concat(newNode), edges: edges.concat(newEdge) };
+    });
+
+    const sourceNodeTitle = sourceNode.data.title;
+    const sourceNodeContent = sourceNode.data.content;
+    const followUpPrompt = title;
+    const prompt = followUpPrompt;
+
+    generateResponse({
+      id: newId,
+      prompt: prompt,
+      markdownMode: markdownMode,
+      onUpdateNodeContent: get().onUpdateNodeContent,
+      context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
     });
   },
 }));

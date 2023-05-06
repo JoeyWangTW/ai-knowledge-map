@@ -5,13 +5,27 @@ export const config = {
 };
 
 export async function POST(req: Request) {
-  const { prompt } = (await req.json()) as {
+  const { prompt,context, markdownMode} = (await req.json()) as {
     prompt?: string;
+    markdownMode?: boolean;
+    context?: Array<{ user: string; assistant: string }>;
   };
 
+  const messages = context
+    ? [
+        ...context.map((entry) => [
+          { role: "user" || "user", content: entry.user },
+          { role: "assistant" || "user", content: entry.assistant },
+        ]),
+        { role: "user" || "user", content: prompt || "" },
+        ...(markdownMode ? [{ role: "system", content: "" }] : []),
+      ].flat()
+    : [{ role: "user" || "", content: prompt || "" }];
+
+  console.log(messages)
   const payload = {
     model: "gpt-3.5-turbo",
-    messages: [{ role: "user" as "user" | "assistant", content: prompt || "" }],
+    messages: messages,
     stream: true,
   };
 
