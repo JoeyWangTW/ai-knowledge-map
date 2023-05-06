@@ -39,14 +39,21 @@ export type RFState = {
   }) => void;
   onAddNode: ({
     title,
-    sourceNodeId,
     markdownMode,
   }: {
     title: string;
-    sourceNodeId: string;
     markdownMode: boolean;
   }) => void;
   onDeleteEdge: (id: string) => void;
+  onAddFollowUpNode: ({
+    title,
+    sourceId,
+    markdownMode,
+  }: {
+    title: string;
+    sourceId: string;
+    markdownMode: boolean;
+  }) => void;
 };
 
 const generateResponse = async ({
@@ -163,7 +170,6 @@ const useStore = create<RFState>((set, get) => ({
   },
   onAddNode: ({
     title,
-    sourceNodeId,
     markdownMode,
   }: {
     title: string;
@@ -212,6 +218,50 @@ const useStore = create<RFState>((set, get) => ({
     sourceId: string;
   }) => {
     set({ followUpModal: { shown: shown, sourceId: sourceId } });
+  },
+  onAddFollowUpNode: ({
+    title,
+    sourceId,
+    markdownMode,
+  }: {
+    title: string;
+    sourceId: string;
+    markdownMode: boolean;
+  }) => {
+    const newId = getId();
+
+    const sourceNode = get().nodes.find((node) => node.id === sourceId);
+
+    if (!sourceNode) {
+      console.error("Source node not found!");
+      return;
+    }
+
+    set(({ nodes }) => {
+      const newNodeX = sourceNode.position.x;
+      const newNodeY = sourceNode.position.y + (sourceNode.height ?? 0) + 50;
+      const newNode = {
+        id: newId,
+        type: "universalNode",
+        data: { title: title },
+        position: { x: newNodeX, y: newNodeY },
+      };
+
+      return { nodes: nodes.concat(newNode) };
+    });
+
+    const sourceNodeTitle = sourceNode.data.title;
+    const sourceNodeContent = sourceNode.data.content;
+    const followUpPrompt = `${sourceNodeTitle}\n${sourceNodeContent}\n\n${title}`;
+    const prompt = markdownMode
+      ? `${followUpPrompt}\n\nWrite in markdown:`
+      : followUpPrompt;
+
+    generateResponse({
+      id: newId,
+      prompt: prompt,
+      onUpdateNodeContent: get().onUpdateNodeContent,
+    });
   },
 }));
 

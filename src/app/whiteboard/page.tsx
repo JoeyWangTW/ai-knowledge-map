@@ -23,6 +23,7 @@ const selector = (state: RFState) => ({
   importNodesAndEdges: state.importNodesAndEdges,
   followUpModal: state.followUpModal,
   setFollowUpModal: state.setFollowUpModal,
+  onAddFollowUpNode: state.onAddFollowUpNode,
 });
 
 function PromptModal() {
@@ -101,7 +102,7 @@ function PromptModal() {
 }
 
 function FollowUpModal() {
-  const { onAddNode, followUpModal, setFollowUpModal } = useStore(
+  const { onAddFollowUpNode, followUpModal, setFollowUpModal } = useStore(
     selector,
     shallow
   );
@@ -118,9 +119,9 @@ function FollowUpModal() {
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const sourceNodeId = followUpModal.sourceId;
+    const sourceId = followUpModal.sourceId;
     va.track("followup_submitted", { prompt: `${prompt}` });
-    onAddNode({ title: prompt, sourceNodeId, markdownMode });
+    onAddFollowUpNode({ title: prompt, sourceId, markdownMode });
     setPrompt("");
     setFollowUpModal({ shown: false, souceId: "" });
   };
