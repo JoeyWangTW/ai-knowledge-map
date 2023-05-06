@@ -145,6 +145,7 @@ function FollowUpModal() {
                   sourceId: "",
                   sourceHandle: "",
                 });
+                setPrompt("");
               }}
             >
               <XMarkIcon />
