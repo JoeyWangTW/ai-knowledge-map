@@ -16,6 +16,7 @@ import {
 export type RFState = {
   showModal: boolean;
   followUpModal: { shown: boolean; sourceId: string; sourceHandle: string };
+  showInitModal: boolean;
   setFollowUpModal: ({
     shown,
     sourceId,
@@ -25,6 +26,7 @@ export type RFState = {
     sourceId: string;
     sourceHandle: string;
   }) => void;
+  setShowInitModal: (showInitModal: boolean) => void;
   onSetShowModal: (showModal: boolean) => void;
   nodes: Node[];
   edges: Edge[];
@@ -46,6 +48,7 @@ export type RFState = {
     title: string;
     markdownMode: boolean;
   }) => void;
+  onAddInitNode: ({ topic }: { topic: string }) => void;
   onDeleteNode: (id: string) => void;
   onDeleteEdge: (id: string) => void;
   onAddFollowUpNode: ({
@@ -209,6 +212,32 @@ const useStore = create<RFState>((set, get) => ({
       context: [],
     });
   },
+  onAddInitNode: ({ topic }: { topic: string }) => {
+    const newId = getId();
+    set(({ nodes }) => {
+      const lastNode = nodes[nodes.length - 1];
+      const newNodeX = lastNode ? lastNode.position.x : 0;
+      const newNodeY = lastNode
+        ? lastNode.position.y + (lastNode.height ?? 0) + 50
+        : 0;
+      const newNode = {
+        id: newId,
+        type: "universalNode",
+        data: { title: topic },
+        position: { x: newNodeX, y: newNodeY },
+      };
+
+      return { nodes: nodes.concat(newNode) };
+    });
+    const prompt = topic;
+    generateResponse({
+      id: newId,
+      prompt: prompt,
+      markdownMode: true,
+      onUpdateNodeContent: get().onUpdateNodeContent,
+      context: [],
+    });
+  },
   onDeleteNode: (id: string) => {
     set(({ nodes, edges }) => {
       const updatedNodes = nodes.filter((node) => node.id !== id);
@@ -218,9 +247,13 @@ const useStore = create<RFState>((set, get) => ({
       return { nodes: updatedNodes, edges: updatedEdges };
     });
   },
-  showModal: true,
+  showModal: false,
   onSetShowModal: (showModal: boolean) => {
     set({ showModal });
+  },
+  showInitModal: true,
+  setShowInitModal: (showInitModal: boolean) => {
+    set({ showInitModal });
   },
   onDeleteEdge: (id: string) => {
     set((state) => {
