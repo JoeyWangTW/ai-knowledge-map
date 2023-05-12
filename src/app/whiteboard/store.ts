@@ -66,12 +66,14 @@ export type RFState = {
 
 const generateResponse = async ({
   id,
+  type,
   prompt,
   onUpdateNodeContent,
   markdownMode,
   context,
 }: {
   id: string;
+  type: string;
   prompt: string;
   markdownMode: boolean;
   onUpdateNodeContent: ({
@@ -83,7 +85,7 @@ const generateResponse = async ({
   }) => void;
   context: Array<{ user: string; assistant: string }>;
 }) => {
-  const response = await fetch("/api/custom", {
+  const response = await fetch(`/api/${type}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -206,6 +208,7 @@ const useStore = create<RFState>((set, get) => ({
     const prompt = title;
     generateResponse({
       id: newId,
+      type: "custom",
       prompt: prompt,
       markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
@@ -215,16 +218,11 @@ const useStore = create<RFState>((set, get) => ({
   onAddInitNode: ({ topic }: { topic: string }) => {
     const newId = getId();
     set(({ nodes }) => {
-      const lastNode = nodes[nodes.length - 1];
-      const newNodeX = lastNode ? lastNode.position.x : 0;
-      const newNodeY = lastNode
-        ? lastNode.position.y + (lastNode.height ?? 0) + 50
-        : 0;
       const newNode = {
         id: newId,
         type: "universalNode",
         data: { title: topic },
-        position: { x: newNodeX, y: newNodeY },
+        position: { x: 0, y: 0 },
       };
 
       return { nodes: nodes.concat(newNode) };
@@ -232,6 +230,7 @@ const useStore = create<RFState>((set, get) => ({
     const prompt = topic;
     generateResponse({
       id: newId,
+      type: "initialize-graph",
       prompt: prompt,
       markdownMode: true,
       onUpdateNodeContent: get().onUpdateNodeContent,
@@ -361,6 +360,7 @@ const useStore = create<RFState>((set, get) => ({
 
     generateResponse({
       id: newId,
+      type: "custom",
       prompt: prompt,
       markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,

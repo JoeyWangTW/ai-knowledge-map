@@ -1,27 +1,42 @@
-const { Configuration, OpenAIApi } = require("openai");
-import { NextResponse } from 'next/server';
+import { OpenAIStream } from "../../utils/OpenAIStream";
 
-export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const topic = searchParams.get('topic');
+export const config = {
+  runtime: "edge",
+};
 
-    const configuration = new Configuration({
-        apiKey: process.env.OPENAI_API_KEY,
-    });
-    const openai = new OpenAIApi(configuration);
+export async function POST(req: Request) {
+  const { prompt,context, markdownMode} = (await req.json()) as {
+    prompt?: string;
+    markdownMode?: boolean;
+    context?: Array<{ user: string; assistant: string }>;
+  };
 
-    const initialPrompt = `Write a short summary about ${topic}, it should be 100-200 words.
-Then list out essential subtopics that can help fully understand the topic, all subtopics need a short description
-result should be in json format, inclusing the following items:
-topic: ${topic}
-summary: summary of the topic
-subtopics: [{topic: subtopic, description: short description}]
-reply in the same language of ${topic}`
+  const initPrompt = `Write a high level overview of ${prompt}, and give 5 most important subtopic and their high level overview,
+write in this format
+{"summary": <high level overview>,
+                        "subtopic": [{"subtopic": <subtopic>,
+"content": <subtopic high level overview>}, ...]}`
+    const system = `format response in JSON, take any text in "" and use it as keyword, content can be markdown, markwond title start from h2`
 
-    const topicSummaryResponse = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [{role: "user", content: initialPrompt}],
-    });
 
-    return NextResponse.json(topicSummaryResponse.data)
+  const messages = context
+    ? [
+        ...context.map((entry) => [
+          { role: "user" || "user", content: entry.user },
+          { role: "assistant" || "user", content: entry.assistant },
+        ]),
+        { role: "user" || "user", content: initPrompt || "" },
+        ...(markdownMode ? [{ role: "system", content: "format reponse in json" }] : []),
+      ].flat()
+    : [{ role: "user" || "", content: initPrompt || "" }];
+
+  console.log(messages)
+  const payload = {
+    model: "gpt-3.5-turbo",
+    messages: messages,
+    stream: true,
+  };
+
+  const stream = await OpenAIStream(payload);
+  return new Response(stream);
 }
