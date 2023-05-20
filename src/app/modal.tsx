@@ -195,7 +195,7 @@ export function InitModal() {
 
   const [prompt, setPrompt] = useState("");
   const [markdownMode, setMarkdownMode] = useState(true);
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrompt(e.target.value);
   };
 
