@@ -41,6 +41,14 @@ export type RFState = {
     nodeId: string;
     content: string;
   }) => void;
+  onUpdateNodeAutoPrompts: ({
+    nodeId,
+    autoPrompts,
+  }: {
+    nodeId: string;
+    autoPrompts: string[];
+  }) => void;
+
   onAddNode: ({
     title,
     markdownMode,
@@ -123,17 +131,16 @@ const generatePrompts = async ({
   context: Array<{ user: string; assistant: string }>;
 }) => {
   const response = await fetch("/api/auto-follow-up", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    context,
-  }),
-});
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      context,
+    }),
+  });
 
   const data = await response.json();
-
 
   if (!response.ok) {
     throw new Error(response.statusText);
@@ -141,12 +148,9 @@ const generatePrompts = async ({
 
   if (!data) {
     return;
-
   }
-  return JSON.parse(data).prompts
-
+  return JSON.parse(data).prompts;
 };
-
 
 let id = 1;
 const getId = () => `${id++}`;
@@ -213,6 +217,30 @@ const useStore = create<RFState>((set, get) => ({
       return { nodes: updatedNodes };
     });
   },
+  onUpdateNodeAutoPrompts: ({
+    nodeId,
+    autoPrompts,
+  }: {
+    nodeId: string;
+    autoPrompts: string[];
+  }) => {
+    set((state) => {
+      const updatedNodes = state.nodes.map((node) => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              autoPrompts: autoPrompts,
+            },
+          };
+        }
+        return node;
+      });
+
+      return { nodes: updatedNodes };
+    });
+  },
   onAddNode: ({
     title,
     markdownMode,
@@ -244,6 +272,19 @@ const useStore = create<RFState>((set, get) => ({
       markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
       context: [],
+    }).then(() => {
+      const sourceNode = get().nodes.find((node) => node.id === newId);
+      const sourceNodeTitle = sourceNode.data.title;
+      const sourceNodeContent = sourceNode.data.content;
+
+      generatePrompts({
+        context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
+      }).then((autoPrompts) => {
+        get().onUpdateNodeAutoPrompts({
+          nodeId: newId,
+          autoPrompts: autoPrompts,
+        });
+      });
     });
   },
   onAddInitNode: ({ topic }: { topic: string }) => {
@@ -308,26 +349,6 @@ const useStore = create<RFState>((set, get) => ({
         sourceHandle: sourceHandle,
       },
     });
-
-    const sourceNode = get().nodes.find((node) => node.id === sourceId);
-    const sourceNodeTitle = sourceNode.data.title;
-    const sourceNodeContent = sourceNode.data.content;
-
-    const autoPrompts = generatePrompts({
-      context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
-      });
-
-    const updatedNodes = [...get().nodes];
-    const sourceNodeIndex = updatedNodes.findIndex((node) => node.id === sourceId);
-
-    if (sourceNodeIndex > -1) {
-      updatedNodes[sourceNodeIndex].data = {
-        ...updatedNodes[sourceNodeIndex].data,
-        autoPrompts: autoPrompts,
-      };
-    }
-    set({nodes: updatedNodes})
-
   },
   onAddFollowUpNode: ({
     title,
