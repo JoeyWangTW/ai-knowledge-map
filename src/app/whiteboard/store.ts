@@ -250,7 +250,7 @@ const useStore = create<RFState>((set, get) => ({
   onSetShowModal: (showModal: boolean) => {
     set({ showModal });
   },
-  showInitModal: true,
+  showInitModal: false,
   setShowInitModal: (showInitModal: boolean) => {
     set({ showInitModal });
   },
