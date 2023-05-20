@@ -117,6 +117,37 @@ const generateResponse = async ({
   }
 };
 
+const generatePrompts = async ({
+  context,
+}: {
+  context: Array<{ user: string; assistant: string }>;
+}) => {
+  const response = await fetch("/api/auto-follow-up", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    context,
+  }),
+});
+
+  const data = await response.json();
+
+
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+
+  if (!data) {
+    return;
+
+  }
+  return JSON.parse(data).prompts
+
+};
+
+
 let id = 1;
 const getId = () => `${id++}`;
 
@@ -277,6 +308,26 @@ const useStore = create<RFState>((set, get) => ({
         sourceHandle: sourceHandle,
       },
     });
+
+    const sourceNode = get().nodes.find((node) => node.id === sourceId);
+    const sourceNodeTitle = sourceNode.data.title;
+    const sourceNodeContent = sourceNode.data.content;
+
+    const autoPrompts = generatePrompts({
+      context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
+      });
+
+    const updatedNodes = [...get().nodes];
+    const sourceNodeIndex = updatedNodes.findIndex((node) => node.id === sourceId);
+
+    if (sourceNodeIndex > -1) {
+      updatedNodes[sourceNodeIndex].data = {
+        ...updatedNodes[sourceNodeIndex].data,
+        autoPrompts: autoPrompts,
+      };
+    }
+    set({nodes: updatedNodes})
+
   },
   onAddFollowUpNode: ({
     title,
