@@ -18,7 +18,7 @@ export async function POST(req: Request) {
           { role: "assistant" || "user", content: entry.assistant },
         ]),
         { role: "user" || "user", content: prompt || "" },
-        ...(markdownMode ? [{ role: "system", content: "" }] : []),
+        ...(markdownMode ? [{ role: "system", content: "format response using markdown, title start from h2" }] : []),
       ].flat()
     : [{ role: "user" || "", content: prompt || "" }];
 

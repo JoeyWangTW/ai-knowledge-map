@@ -16,6 +16,7 @@ import {
 export type RFState = {
   showModal: boolean;
   followUpModal: { shown: boolean; sourceId: string; sourceHandle: string };
+  showInitModal: boolean;
   setFollowUpModal: ({
     shown,
     sourceId,
@@ -25,6 +26,7 @@ export type RFState = {
     sourceId: string;
     sourceHandle: string;
   }) => void;
+  setShowInitModal: (showInitModal: boolean) => void;
   onSetShowModal: (showModal: boolean) => void;
   nodes: Node[];
   edges: Edge[];
@@ -46,6 +48,7 @@ export type RFState = {
     title: string;
     markdownMode: boolean;
   }) => void;
+  onAddInitNode: ({ topic }: { topic: string }) => void;
   onDeleteNode: (id: string) => void;
   onDeleteEdge: (id: string) => void;
   onAddFollowUpNode: ({
@@ -63,12 +66,14 @@ export type RFState = {
 
 const generateResponse = async ({
   id,
+  type,
   prompt,
   onUpdateNodeContent,
   markdownMode,
   context,
 }: {
   id: string;
+  type: string;
   prompt: string;
   markdownMode: boolean;
   onUpdateNodeContent: ({
@@ -80,7 +85,7 @@ const generateResponse = async ({
   }) => void;
   context: Array<{ user: string; assistant: string }>;
 }) => {
-  const response = await fetch("/api/custom", {
+  const response = await fetch(`/api/${type}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -203,8 +208,31 @@ const useStore = create<RFState>((set, get) => ({
     const prompt = title;
     generateResponse({
       id: newId,
+      type: "custom",
       prompt: prompt,
       markdownMode: markdownMode,
+      onUpdateNodeContent: get().onUpdateNodeContent,
+      context: [],
+    });
+  },
+  onAddInitNode: ({ topic }: { topic: string }) => {
+    const newId = getId();
+    set(({ nodes }) => {
+      const newNode = {
+        id: newId,
+        type: "universalNode",
+        data: { title: topic },
+        position: { x: 0, y: 0 },
+      };
+
+      return { nodes: nodes.concat(newNode) };
+    });
+    const prompt = topic;
+    generateResponse({
+      id: newId,
+      type: "initialize-graph",
+      prompt: prompt,
+      markdownMode: true,
       onUpdateNodeContent: get().onUpdateNodeContent,
       context: [],
     });
@@ -218,9 +246,13 @@ const useStore = create<RFState>((set, get) => ({
       return { nodes: updatedNodes, edges: updatedEdges };
     });
   },
-  showModal: true,
+  showModal: false,
   onSetShowModal: (showModal: boolean) => {
     set({ showModal });
+  },
+  showInitModal: false,
+  setShowInitModal: (showInitModal: boolean) => {
+    set({ showInitModal });
   },
   onDeleteEdge: (id: string) => {
     set((state) => {
@@ -328,6 +360,7 @@ const useStore = create<RFState>((set, get) => ({
 
     generateResponse({
       id: newId,
+      type: "custom",
       prompt: prompt,
       markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
