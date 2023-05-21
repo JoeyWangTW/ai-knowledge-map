@@ -58,7 +58,7 @@ export function UniversalNode({
   data,
 }: {
   id: string;
-  data: { title: string; content: string };
+  data: { title: string; content: string, autoPrompts: any};
 }) {
   const [dragging, setDragging] = useState(false);
   const { setFollowUpModal, onDeleteNode } = useStore(selector, shallow);

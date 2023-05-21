@@ -274,17 +274,20 @@ const useStore = create<RFState>((set, get) => ({
       context: [],
     }).then(() => {
       const sourceNode = get().nodes.find((node) => node.id === newId);
-      const sourceNodeTitle = sourceNode.data.title;
-      const sourceNodeContent = sourceNode.data.content;
 
-      generatePrompts({
-        context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
-      }).then((autoPrompts) => {
-        get().onUpdateNodeAutoPrompts({
-          nodeId: newId,
-          autoPrompts: autoPrompts,
+      if (sourceNode) {
+        const sourceNodeTitle = sourceNode.data.title;
+        const sourceNodeContent = sourceNode.data.content;
+
+        generatePrompts({
+          context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
+        }).then((autoPrompts) => {
+          get().onUpdateNodeAutoPrompts({
+            nodeId: newId,
+            autoPrompts: autoPrompts,
+          });
         });
-      });
+      }
     });
   },
   onAddInitNode: ({ topic }: { topic: string }) => {
@@ -439,17 +442,20 @@ const useStore = create<RFState>((set, get) => ({
       context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
     }).then(() => {
       const sourceNode = get().nodes.find((node) => node.id === newId);
-      const sourceNodeTitle = sourceNode.data.title;
-      const sourceNodeContent = sourceNode.data.content;
 
-      generatePrompts({
-        context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
-      }).then((autoPrompts) => {
-        get().onUpdateNodeAutoPrompts({
-          nodeId: newId,
-          autoPrompts: autoPrompts,
+      if (sourceNode) {
+        const sourceNodeTitle = sourceNode.data.title;
+        const sourceNodeContent = sourceNode.data.content;
+
+        generatePrompts({
+          context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
+        }).then((autoPrompts) => {
+          get().onUpdateNodeAutoPrompts({
+            nodeId: newId,
+            autoPrompts: autoPrompts,
+          });
         });
-      });
+      }
     });
   },
 }));
