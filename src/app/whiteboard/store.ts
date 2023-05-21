@@ -437,6 +437,19 @@ const useStore = create<RFState>((set, get) => ({
       markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
       context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
+    }).then(() => {
+      const sourceNode = get().nodes.find((node) => node.id === newId);
+      const sourceNodeTitle = sourceNode.data.title;
+      const sourceNodeContent = sourceNode.data.content;
+
+      generatePrompts({
+        context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
+      }).then((autoPrompts) => {
+        get().onUpdateNodeAutoPrompts({
+          nodeId: newId,
+          autoPrompts: autoPrompts,
+        });
+      });
     });
   },
 }));
