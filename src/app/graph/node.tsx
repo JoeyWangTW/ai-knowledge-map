@@ -98,12 +98,11 @@ export function UniversalNode({
           <TrashIcon />
         </button>
         <button
-          className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2
-                        border border-1 border-black hover:scale-125 transform
+          className={`absolute left-1/2 transform -translate-x-1/2 translate-y-1/2
+                        border border-1 ${data.autoPrompts && "bottom-0  hover:scale-125 transform border-black"}
+                        ${!data.autoPrompts && "-bottom-6 animate-bounce border-gray-400"}
                              h-10 w-10 p-2 text-zinc-800 bg-white rounded-full focus:outline-none
-                             opacity-0 group-hover:opacity-100 transition duration-200 ease-in-out ${
-                               dragging && "hidden"
-                             }`}
+                             opacity-0 group-hover:opacity-100 transition duration-200 ease-in-out ${dragging && "hidden"}`}
           onClick={() =>
             setFollowUpModal({
               shown: true,
@@ -111,8 +110,9 @@ export function UniversalNode({
               sourceHandle: "bottom",
             })
           }
+          disabled={!data.autoPrompts}
         >
-          <PlusIcon />
+          <PlusIcon className={`${!data.autoPrompts && "text-gray-400"}`}/>
         </button>
 
         <Handle
