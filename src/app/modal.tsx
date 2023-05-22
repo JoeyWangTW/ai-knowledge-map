@@ -112,8 +112,8 @@ export function FollowUpModal() {
     setPrompt(e.target.value);
   };
 
-  const [autoPrompts, setAutoPrompts] = useState([]);
-useEffect(() => {
+  const [autoPrompts, setAutoPrompts] = useState<string[]>([]);
+  useEffect(() => {
     const sourceNode = nodes.find(node => node.id === followUpModal.sourceId);
     if (sourceNode) {
       setAutoPrompts(sourceNode.data.autoPrompts || []);

@@ -7,16 +7,19 @@ import * as amplitude from '@amplitude/analytics-browser';
 
 export default function Home() {
 
-  let amplitudeAPIKey;
-
-  if (window.location.href.startsWith('https://www.aiknowledgemap')) {
-    amplitudeAPIKey = '9779e1a8358ae0f3fa8e7ea4396e5449';
-  } else {
-    amplitudeAPIKey = '3f6ed3bd676c44ba27fb668b9cc00938';
-  }
-
+  const [amplitudeAPIKey, setAmplitudeAPIKey] = useState<string>('');
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    if (window.location.href.startsWith('https://www.aiknowledgemap')) {
+      setAmplitudeAPIKey('9779e1a8358ae0f3fa8e7ea4396e5449');
+    } else {
+      setAmplitudeAPIKey('3f6ed3bd676c44ba27fb668b9cc00938');
+    }
   amplitude.init(amplitudeAPIKey, undefined,
                  { defaultTracking: { sessions: true, pageViews: true}});
+  }
+}, [amplitudeAPIKey]);
+
 
   const router = useRouter();
   const [topic, setTopic] = useState("");
