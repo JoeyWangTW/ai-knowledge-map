@@ -321,7 +321,7 @@ const useStore = create<RFState>((set, get) => ({
       return { nodes: updatedNodes, edges: updatedEdges };
     });
   },
-  showModal: false,
+  showModal: true,
   onSetShowModal: (showModal: boolean) => {
     set({ showModal });
   },
