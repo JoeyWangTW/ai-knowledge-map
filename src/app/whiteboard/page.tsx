@@ -169,8 +169,17 @@ const SurveyButton = () => {
   );
 };
 
-export default function Home() {
-  amplitude.init("3f6ed3bd676c44ba27fb668b9cc00938", undefined,
+export default function Home(){
+
+  let amplitudeAPIKey;
+
+  if (window.location.href.startsWith('https://www.aiknowledgemap')) {
+    amplitudeAPIKey = '9779e1a8358ae0f3fa8e7ea4396e5449';
+  } else {
+    amplitudeAPIKey = '3f6ed3bd676c44ba27fb668b9cc00938';
+  }
+
+  amplitude.init(amplitudeAPIKey, undefined,
                  { defaultTracking: { sessions: true, pageViews: true}});
   return (
     <main className="font-sans flex items-center justify-center w-screen h-screen flex-1 text-center relative">
