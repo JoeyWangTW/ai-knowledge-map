@@ -53,7 +53,7 @@ export function PromptModal() {
         <div className="absolute h-screen w-screen z-10 bg-zinc-800/50 flex justify-center items-center">
           <dialog
             open
-            className="relative p-4 bg-white rounded-xl text-black min-w-[50%]"
+            className="relative p-4 bg-white rounded-xl text-black min-w-[50%] max-w-[70%]"
           >
             <button
               className="absolute top-1 right-1 h-10 w-10 hover:bg-gray-200 rounded-full p-2"
@@ -143,7 +143,7 @@ export function FollowUpModal() {
         <div className="absolute h-screen w-screen z-10 bg-zinc-800/50 flex justify-center items-center">
           <dialog
             open
-            className="relative p-4 bg-white rounded-xl text-black min-w-[50%]"
+            className="relative p-4 bg-white rounded-xl text-black min-w-[50%] max-w-[70%]"
           >
             <button
               className="absolute top-1 right-1 h-10 w-10 hover:bg-gray-200 rounded-full p-2"
