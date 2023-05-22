@@ -163,6 +163,7 @@ useEffect(() => {
               <div className="mb-4">
                 {autoPrompts.map(prompt => (
                   <button
+                    type="button"
                     key={prompt}
                     className="mr-4 mb-2 px-4 py-2 rounded-xl border border-black
                         transform duration-200 hover:border-b-2 hover:border-r-2 hover:scale-105 ease-in-out"
