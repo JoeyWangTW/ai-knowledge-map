@@ -13,7 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { shallow } from "zustand/shallow";
 import { isNode, isEdge } from "reactflow";
-import va from "@vercel/analytics";
+import * as amplitude from '@amplitude/analytics-browser';
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -34,6 +34,7 @@ function NewNodeButton() {
       className="group relative h-10 w-max text-zinc-800 bg-gray-100 hover:bg-gray-200 rounded-full
                  focus:outline-none transition-all duration-200 ease-out"
       onClick={() => {
+        amplitude.track("new-node-started")
         onSetShowModal(true);
       }}
     >
@@ -72,7 +73,7 @@ function ImportButton() {
               importedNodes.every((el) => isNode(el)) &&
               importedEdges.every((el) => isEdge(el))
             ) {
-              va.track("graph_imported");
+              amplitude.track("graph-imported");
               importNodesAndEdges(importedNodes, importedEdges);
             } else {
               alert(
@@ -129,7 +130,7 @@ For help, check our documentation or contact support."
 function ExportButton() {
   const { nodes, edges } = useStore(selector, shallow);
   const onExport = () => {
-    va.track("graph_exported");
+    amplitude.track("graph-exported");
     const serializedData = JSON.stringify({ nodes: nodes, edges: edges });
     const blob = new Blob([serializedData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -169,6 +170,8 @@ const SurveyButton = () => {
 };
 
 export default function Home() {
+  amplitude.init("3f6ed3bd676c44ba27fb668b9cc00938", undefined,
+                 { defaultTracking: { sessions: true, pageViews: true}});
   return (
     <main className="font-sans flex items-center justify-center w-screen h-screen flex-1 text-center relative">
       <Whiteboard />

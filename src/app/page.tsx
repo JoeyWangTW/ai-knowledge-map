@@ -2,10 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Analytics } from "@vercel/analytics/react";
-import va from "@vercel/analytics";
+import * as amplitude from '@amplitude/analytics-browser';
+
 
 export default function Home() {
+
+  amplitude.init("3f6ed3bd676c44ba27fb668b9cc00938", undefined,
+                 { defaultTracking: { sessions: true, pageViews: true, formInteractions: true, fileDownloads: true }});
+
   const router = useRouter();
   const [topic, setTopic] = useState("");
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -13,18 +17,16 @@ export default function Home() {
   };
   const handleTopicSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    va.track("topic_submitted", { topic: `${topic}` });
     router.push(`/graph?topic=${topic}`);
   };
 
   const handleWhiteboard = () => {
-    va.track("start_clicked")
+    amplitude.track('start-button-clicked');
     router.push(`/whiteboard`);
   };
 
   return (
     <main className="relative flex items-center justify-center w-screen h-screen flex-1 text-center bg-zinc-800 text-white">
-      <Analytics />
       <div className="absolute bg-[url('/landing_page_bg.png')] bg-center bg-no-repeat bg-cover bg-/2
                       h-screen w-screen opacity-5 -z-1"></div>
       <div className="relative w-3/5-md w-4/5-xs z-10 rounded-3xl p-10">

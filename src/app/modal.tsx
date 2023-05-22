@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { shallow } from "zustand/shallow";
 import { isNode, isEdge } from "reactflow";
-import va from "@vercel/analytics";
+import * as amplitude from '@amplitude/analytics-browser';
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -41,7 +41,7 @@ export function PromptModal() {
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    va.track("topic_submitted", { prompt: `${prompt}` });
+    amplitude.track("new-node-submitted", { prompt: `${prompt}` });
     onAddNode({ title: prompt, markdownMode });
     setPrompt("");
     onSetShowModal(false);
@@ -126,7 +126,7 @@ useEffect(() => {
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    va.track("followup_submitted", { prompt: `${prompt}` });
+    amplitude.track("follow-up-submitted", { prompt: `${prompt}`, auto_prompt: autoPrompts.includes(prompt)});
     onAddFollowUpNode({
       title: prompt,
       sourceId: followUpModal.sourceId,
@@ -225,7 +225,7 @@ export function InitModal() {
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    va.track("topic_submitted", { prompt: `${prompt}` });
+    amplitude.track("init-submitted", { prompt: `${prompt}` });
     onAddInitNode({ topic: prompt });
     setPrompt("");
     setShowInitModal(false);
