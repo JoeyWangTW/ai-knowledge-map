@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { shallow } from "zustand/shallow";
 import { isNode, isEdge } from "reactflow";
-import va from "@vercel/analytics";
+import * as amplitude from '@amplitude/analytics-browser';
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -41,7 +41,7 @@ export function PromptModal() {
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    va.track("topic_submitted", { prompt: `${prompt}` });
+    amplitude.track("new-node-submitted", { prompt: `${prompt}` });
     onAddNode({ title: prompt, markdownMode });
     setPrompt("");
     onSetShowModal(false);
@@ -112,8 +112,8 @@ export function FollowUpModal() {
     setPrompt(e.target.value);
   };
 
-  const [autoPrompts, setAutoPrompts] = useState([]);
-useEffect(() => {
+  const [autoPrompts, setAutoPrompts] = useState<string[]>([]);
+  useEffect(() => {
     const sourceNode = nodes.find(node => node.id === followUpModal.sourceId);
     if (sourceNode) {
       setAutoPrompts(sourceNode.data.autoPrompts || []);
@@ -126,7 +126,7 @@ useEffect(() => {
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    va.track("followup_submitted", { prompt: `${prompt}` });
+    amplitude.track("follow-up-submitted", { prompt: `${prompt}`, auto_prompt: autoPrompts.includes(prompt)});
     onAddFollowUpNode({
       title: prompt,
       sourceId: followUpModal.sourceId,
@@ -163,6 +163,7 @@ useEffect(() => {
               <div className="mb-4">
                 {autoPrompts.map(prompt => (
                   <button
+                    type="button"
                     key={prompt}
                     className="mr-4 mb-2 px-4 py-2 rounded-xl border border-black
                         transform duration-200 hover:border-b-2 hover:border-r-2 hover:scale-105 ease-in-out"
@@ -225,7 +226,7 @@ export function InitModal() {
 
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    va.track("topic_submitted", { prompt: `${prompt}` });
+    amplitude.track("init-submitted", { prompt: `${prompt}` });
     onAddInitNode({ topic: prompt });
     setPrompt("");
     setShowInitModal(false);

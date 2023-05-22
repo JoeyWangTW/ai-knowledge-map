@@ -18,10 +18,10 @@ import ReactFlow, {
   Position,
   NodeResizer,
 } from "reactflow";
-import va from "@vercel/analytics";
 import { PlusIcon, TrashIcon, LinkIcon } from "@heroicons/react/24/outline";
 import useStore, { RFState } from "../whiteboard/store";
 import { shallow } from "zustand/shallow";
+import * as amplitude from '@amplitude/analytics-browser';
 
 const selector = (state: RFState) => ({
   onUpdateNodeContent: state.onUpdateNodeContent,
@@ -104,11 +104,14 @@ export function UniversalNode({
                              h-10 w-10 p-2 text-zinc-800 bg-white rounded-full focus:outline-none
                              opacity-0 group-hover:opacity-100 transition duration-200 ease-in-out ${dragging && "hidden"}`}
           onClick={() =>
+            {
+            amplitude.track("follow-up-started")
             setFollowUpModal({
               shown: true,
               sourceId: id,
               sourceHandle: "bottom",
             })
+            }
           }
           disabled={!data.autoPrompts}
         >
@@ -173,7 +176,6 @@ export function TopicNode({
 
   const onDivergeClicked = useCallback(() => {
     setDivergeStatus("loading");
-    va.track("topic_diverged");
     async function fetchData() {
       try {
         const response = await fetch(
@@ -208,7 +210,6 @@ export function TopicNode({
   }, [data, id]);
   const onConvergeClicked = useCallback(() => {
     setConvergeStatus("loading");
-    va.track("topic_converged");
     console.log(data);
     async function fetchData(topic: string) {
       try {
