@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useStore, { RFState } from "./whiteboard/store";
 import {
   XMarkIcon,
@@ -101,7 +101,7 @@ export function PromptModal() {
 }
 
 export function FollowUpModal() {
-  const { onAddFollowUpNode, followUpModal, setFollowUpModal } = useStore(
+  const { onAddFollowUpNode, followUpModal, setFollowUpModal, nodes } = useStore(
     selector,
     shallow
   );
@@ -111,6 +111,14 @@ export function FollowUpModal() {
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
   };
+
+  const [autoPrompts, setAutoPrompts] = useState([]);
+useEffect(() => {
+    const sourceNode = nodes.find(node => node.id === followUpModal.sourceId);
+    if (sourceNode) {
+      setAutoPrompts(sourceNode.data.autoPrompts || []);
+    }
+}, [followUpModal.sourceId, nodes]);
 
   const handleMarkdownToggle = () => {
     setMarkdownMode((prevMode) => !prevMode);
@@ -152,12 +160,24 @@ export function FollowUpModal() {
             </button>
             <h1 className="font-bold text-xl mb-6">Enter Follow Up Prompt</h1>
             <form onSubmit={handlePromptSubmit}>
+              <div className="mb-4">
+                {autoPrompts.map(prompt => (
+                  <button
+                    key={prompt}
+                    className="mr-4 mb-2 px-4 py-2 rounded-xl border border-black
+                        transform duration-200 hover:border-b-2 hover:border-r-2 hover:scale-105 ease-in-out"
+                    onClick={() => setPrompt(prompt)}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
               <textarea
                 placeholder="Type your text here..."
                 className="w-full resize-none border border-black rounded-xl px-2 py-1
                              text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-0
                              mb-4"
-                rows={7}
+                rows={3}
                 value={prompt}
                 onChange={handleInputChange}
               ></textarea>

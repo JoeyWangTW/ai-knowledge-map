@@ -83,3 +83,25 @@ export async function OpenAIStream(payload:Payload) {
 
   return stream;
 }
+
+export async function OpenAIComplete(payload:Payload) {
+  const url = 'https://api.openai.com/v1/chat/completions';
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
+    },
+    body: JSON.stringify(payload),
+  };
+
+  const response = await fetch(url, options);
+
+  // Check if request was successful
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
+}
