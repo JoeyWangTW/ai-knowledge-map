@@ -127,8 +127,10 @@ const generateResponse = async ({
 
 const generatePrompts = async ({
   context,
+  count,
 }: {
   context: Array<{ user: string; assistant: string }>;
+  count: number;
 }) => {
   const response = await fetch("/api/auto-follow-up", {
     method: "POST",
@@ -137,6 +139,7 @@ const generatePrompts = async ({
     },
     body: JSON.stringify({
       context,
+      count,
     }),
   });
 
@@ -280,6 +283,7 @@ const useStore = create<RFState>((set, get) => ({
         const sourceNodeContent = sourceNode.data.content;
 
         generatePrompts({
+          count: 5,
           context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
         }).then((autoPrompts) => {
           get().onUpdateNodeAutoPrompts({
@@ -448,6 +452,7 @@ const useStore = create<RFState>((set, get) => ({
         const sourceNodeContent = sourceNode.data.content;
 
         generatePrompts({
+          count: 5,
           context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
         }).then((autoPrompts) => {
           get().onUpdateNodeAutoPrompts({
