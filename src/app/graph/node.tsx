@@ -61,18 +61,20 @@ export function UniversalNode({
   data: { title: string; content: string, autoPrompts: any};
 }) {
   const [dragging, setDragging] = useState(false);
+  const [resized, setResized] = useState(false);
   const { setFollowUpModal, onDeleteNode } = useStore(selector, shallow);
   return (
     <>
       <div
-        className="group relative h-full w-full border border-2 border-black bg-white
-                         text-black rounded-xl flex flex-col "
+        className={`group relative h-full w-full border border-2 border-black bg-white
+              text-black rounded-xl flex flex-col ${!resized && "w-[750px] h-[750px]"}`}
       >
         <NodeResizeControl
           minWidth={100}
           minHeight={100}
           onResizeStart={() => setDragging(true)}
           onResizeEnd={() => setDragging(false)}
+          onResize={() => setResized(true)}
           className="group-hover:opacity-100 opacity-0 bg-transparent border-none transition-opacity duration-200 w-0 h-0 border-none"
         >
           <ResizeIcon />

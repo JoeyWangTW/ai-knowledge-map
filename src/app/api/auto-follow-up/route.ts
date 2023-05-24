@@ -6,12 +6,14 @@ export const config = {
 };
 
 export async function POST(req: Request) {
-  const {context} = (await req.json()) as {
+  const {context, count} = (await req.json()) as {
+      count?: number;
     context?: Array<{ user: string; assistant: string }>;
   };
 
-    const prompt = `base on the above, give me 5 more useful follow up questions that I can ask a Large language model to learn more about this topic.`
+    const prompt = `base on the above, give me ${count} useful follow up questions that I can ask a Large language model to learn more about this topic.`
 
+    console.log(prompt)
   const messages = context
     ? [
         ...context.map((entry) => [
