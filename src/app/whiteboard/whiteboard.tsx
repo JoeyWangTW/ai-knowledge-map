@@ -48,7 +48,8 @@ function Flow() {
     []
   );
 
-  const defaultViewport: Viewport = { x: 100, y: 100, zoom: 0.7 }
+
+  const defaultViewport = {x: window.innerWidth / 2, y: window.innerHeight / 2, zoom:0.5}
 
   return (
     <ReactFlow
