@@ -56,7 +56,7 @@ export type RFState = {
     title: string;
     markdownMode: boolean;
   }) => void;
-  onAddInitNode: ({ topic }: { topic: string }) => void;
+  addInitNodes: ({ topic }: { topic: string }) => void;
   onDeleteNode: (id: string) => void;
   onDeleteEdge: (id: string) => void;
   onAddFollowUpNode: ({
@@ -153,6 +153,23 @@ const generatePrompts = async ({
     return;
   }
   return JSON.parse(data).prompts;
+};
+
+const nodeSize = 750;
+
+const getPosition = (
+  breadth: number,
+  layer: number,
+  index: number,
+  padding: number
+) => {
+  const nodePerLayer = breadth ** layer;
+  console.warn(layer, index, nodePerLayer);
+  const angle = (index / nodePerLayer) * 2 * Math.PI;
+  const radius = layer * (nodeSize * Math.sqrt(2) + padding);
+  const x = radius * Math.cos(angle) - nodeSize / 2;
+  const y = radius * Math.sin(angle) - nodeSize / 2;
+  return { x, y };
 };
 
 let id = 1;
@@ -294,27 +311,118 @@ const useStore = create<RFState>((set, get) => ({
       }
     });
   },
-  onAddInitNode: ({ topic }: { topic: string }) => {
+  addInitNodes: async ({ topic }: { topic: string }) => {
+    const depth = 2;
+    const breadth = 4;
+
     const newId = getId();
     set(({ nodes }) => {
       const newNode = {
         id: newId,
         type: "universalNode",
         data: { title: topic },
-        position: { x: 0, y: 0 },
+        position: { x: 0 - nodeSize / 2, y: 0 - nodeSize / 2 },
       };
-
       return { nodes: nodes.concat(newNode) };
     });
-    const prompt = topic;
-    generateResponse({
+
+    const prompt = `Give me a high level overview about ${topic}`;
+    await generateResponse({
       id: newId,
-      type: "initialize-graph",
+      type: "custom",
       prompt: prompt,
       markdownMode: true,
       onUpdateNodeContent: get().onUpdateNodeContent,
       context: [],
     });
+
+    const initNode = get().nodes.find((node) => node.id === newId);
+
+    if (initNode) {
+      const initNodeTitle = prompt;
+      const initNodeContent = initNode.data.content;
+
+      const autoPrompts = await generatePrompts({
+        count: breadth,
+        context: [{ user: initNodeTitle, assistant: initNodeContent }],
+      });
+      get().onUpdateNodeAutoPrompts({
+        nodeId: newId,
+        autoPrompts: autoPrompts,
+      });
+    }
+
+    let prevLayerNodes = [{ id: newId, position: { x: 0, y: 0 } }];
+    let newLayerNodes: { id: string; position: { x: number; y: number } }[] =
+      [];
+
+    for (let layer = 1; layer <= depth; layer++) {
+      for (let idx = 0; idx < prevLayerNodes.length; idx++) {
+        const node = prevLayerNodes[idx];
+        const sourceNodeId = node.id;
+        const sourceNode = get().nodes.find((node) => node.id === sourceNodeId);
+
+        for (let i = 0; i < breadth; i++) {
+          const position = getPosition(breadth, layer, i + idx * breadth, 100);
+
+          const prompt = sourceNode
+            ? sourceNode.data.autoPrompts[i]
+            : `tell me more about ${topic}`;
+          const newId = getId();
+
+          set(({ nodes, edges }) => {
+            const newNode = {
+              id: newId,
+              type: "universalNode",
+              data: { title: prompt },
+              position: position,
+            };
+            newLayerNodes.push(newNode);
+
+            const newEdge = {
+              id: `e-${sourceNodeId}-${newId}`,
+              source: sourceNodeId,
+              target: newId,
+              type: "customEdge",
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+              },
+            };
+
+            return {
+              nodes: nodes.concat(newNode),
+              edges: edges.concat(newEdge),
+            };
+          });
+
+          await generateResponse({
+            id: newId,
+            type: "custom",
+            prompt: prompt,
+            markdownMode: true,
+            onUpdateNodeContent: get().onUpdateNodeContent,
+            context: [],
+          });
+
+          const childNode = get().nodes.find((node) => node.id === newId);
+
+          if (childNode) {
+            const childNodeTitle = prompt;
+            const childNodeContent = childNode.data.content;
+
+            const autoPrompts = await generatePrompts({
+              count: breadth,
+              context: [{ user: childNodeTitle, assistant: childNodeContent }],
+            });
+            get().onUpdateNodeAutoPrompts({
+              nodeId: newId,
+              autoPrompts: autoPrompts,
+            });
+          }
+        }
+      }
+      prevLayerNodes = newLayerNodes;
+    }
   },
   onDeleteNode: (id: string) => {
     set(({ nodes, edges }) => {
@@ -325,11 +433,11 @@ const useStore = create<RFState>((set, get) => ({
       return { nodes: updatedNodes, edges: updatedEdges };
     });
   },
-  showModal: true,
+  showModal: false,
   onSetShowModal: (showModal: boolean) => {
     set({ showModal });
   },
-  showInitModal: false,
+  showInitModal: true,
   setShowInitModal: (showInitModal: boolean) => {
     set({ showInitModal });
   },

@@ -23,7 +23,7 @@ const selector = (state: RFState) => ({
   onAddFollowUpNode: state.onAddFollowUpNode,
   showInitModal: state.showInitModal,
   setShowInitModal: state.setShowInitModal,
-  onAddInitNode: state.onAddInitNode,
+  addInitNodes: state.addInitNodes,
 });
 
 export function PromptModal() {
@@ -209,7 +209,7 @@ export function FollowUpModal() {
 }
 
 export function InitModal() {
-  const { onAddInitNode, showInitModal, setShowInitModal } = useStore(
+  const { addInitNodes, showInitModal, setShowInitModal } = useStore(
     selector,
     shallow
   );
@@ -227,7 +227,7 @@ export function InitModal() {
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     amplitude.track("init-submitted", { prompt: `${prompt}` });
-    onAddInitNode({ topic: prompt });
+    addInitNodes({ topic: prompt });
     setPrompt("");
     setShowInitModal(false);
   };
