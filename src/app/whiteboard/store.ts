@@ -56,7 +56,15 @@ export type RFState = {
     title: string;
     markdownMode: boolean;
   }) => void;
-  addInitNodes: ({ topic }: { topic: string }) => void;
+  addInitNodes: ({
+    topic,
+    breadth,
+    depth,
+  }: {
+    topic: string;
+    breadth: number;
+    depth: number;
+  }) => void;
   onDeleteNode: (id: string) => void;
   onDeleteEdge: (id: string) => void;
   onAddFollowUpNode: ({
@@ -311,10 +319,15 @@ const useStore = create<RFState>((set, get) => ({
       }
     });
   },
-  addInitNodes: async ({ topic }: { topic: string }) => {
-    const depth = 2;
-    const breadth = 4;
-
+  addInitNodes: async ({
+    topic,
+    depth,
+    breadth,
+  }: {
+    topic: string;
+    depth: number;
+    breadth: number;
+  }) => {
     const newId = getId();
     set(({ nodes }) => {
       const newNode = {

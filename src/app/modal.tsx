@@ -227,7 +227,7 @@ export function InitModal() {
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     amplitude.track("init-submitted", { prompt: `${prompt}` });
-    addInitNodes({ topic: prompt });
+    addInitNodes({ topic: prompt , breadth: 4, depth: 2});
     setPrompt("");
     setShowInitModal(false);
   };
