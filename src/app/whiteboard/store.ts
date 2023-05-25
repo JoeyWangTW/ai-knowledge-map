@@ -370,70 +370,82 @@ const useStore = create<RFState>((set, get) => ({
       [];
 
     for (let layer = 1; layer <= depth; layer++) {
-      for (let idx = 0; idx < prevLayerNodes.length; idx++) {
-        const node = prevLayerNodes[idx];
+      const newLayerPromises = prevLayerNodes.map((node, idx) => {
         const sourceNodeId = node.id;
         const sourceNode = get().nodes.find((node) => node.id === sourceNodeId);
 
-        for (let i = 0; i < breadth; i++) {
-          const position = getPosition(breadth, layer, i + idx * breadth, 100);
+        const tasks = Array(breadth)
+          .fill(null)
+          .map(async (_, i) => {
+            const position = getPosition(
+              breadth,
+              layer,
+              i + idx * breadth,
+              100
+            );
 
-          const prompt = sourceNode
-            ? sourceNode.data.autoPrompts[i]
-            : `tell me more about ${topic}`;
-          const newId = getId();
+            const prompt = sourceNode
+              ? sourceNode.data.autoPrompts[i]
+              : `tell me more about ${topic}`;
+            const newId = getId();
 
-          set(({ nodes, edges }) => {
-            const newNode = {
+            set(({ nodes, edges }) => {
+              const newNode = {
+                id: newId,
+                type: "universalNode",
+                data: { title: prompt },
+                position: position,
+              };
+              newLayerNodes.push(newNode);
+
+              const newEdge = {
+                id: `e-${sourceNodeId}-${newId}`,
+                source: sourceNodeId,
+                target: newId,
+                type: "customEdge",
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                },
+              };
+
+              return {
+                nodes: nodes.concat(newNode),
+                edges: edges.concat(newEdge),
+              };
+            });
+
+            await generateResponse({
               id: newId,
-              type: "universalNode",
-              data: { title: prompt },
-              position: position,
-            };
-            newLayerNodes.push(newNode);
-
-            const newEdge = {
-              id: `e-${sourceNodeId}-${newId}`,
-              source: sourceNodeId,
-              target: newId,
-              type: "customEdge",
-              markerEnd: {
-                type: MarkerType.ArrowClosed,
-              },
-            };
-
-            return {
-              nodes: nodes.concat(newNode),
-              edges: edges.concat(newEdge),
-            };
-          });
-
-          await generateResponse({
-            id: newId,
-            type: "custom",
-            prompt: prompt,
-            markdownMode: true,
-            onUpdateNodeContent: get().onUpdateNodeContent,
-            context: [],
-          });
-
-          const childNode = get().nodes.find((node) => node.id === newId);
-
-          if (childNode) {
-            const childNodeTitle = prompt;
-            const childNodeContent = childNode.data.content;
-
-            const autoPrompts = await generatePrompts({
-              count: breadth,
-              context: [{ user: childNodeTitle, assistant: childNodeContent }],
+              type: "custom",
+              prompt: prompt,
+              markdownMode: true,
+              onUpdateNodeContent: get().onUpdateNodeContent,
+              context: [],
             });
-            get().onUpdateNodeAutoPrompts({
-              nodeId: newId,
-              autoPrompts: autoPrompts,
-            });
-          }
-        }
-      }
+
+            const childNode = get().nodes.find((node) => node.id === newId);
+
+            if (childNode) {
+              const childNodeTitle = prompt;
+              const childNodeContent = childNode.data.content;
+
+              const autoPrompts = await generatePrompts({
+                count: breadth,
+                context: [
+                  { user: childNodeTitle, assistant: childNodeContent },
+                ],
+              });
+              get().onUpdateNodeAutoPrompts({
+                nodeId: newId,
+                autoPrompts: autoPrompts,
+              });
+            }
+          });
+        return Promise.all(tasks);
+      });
+
+      await Promise.all(newLayerPromises);
+
       prevLayerNodes = newLayerNodes;
     }
   },
