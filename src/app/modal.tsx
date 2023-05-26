@@ -248,19 +248,21 @@ export function InitModal() {
             >
               <XMarkIcon />
             </button>
-            <h1 className="font-bold text-xl mb-6">
-              Generate Knowledge Map about...
+            <h1 className="font-bold text-xl mb-6 mt-2">
+              Enter a topic you’re curious about...
             </h1>
             <form onSubmit={handlePromptSubmit}>
               <input
                 placeholder="ex: SEO optimization"
-                className="w-full h-16 resize-none border border-black rounded-xl px-2 py-1
+                className="w-4/5 h-16 resize-none border border-black rounded-xl px-2 py-1
                              text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-0
                              mb-4"
                 value={prompt}
                 onChange={handleInputChange}
               />
-              <div className="mb-2 flex items-center"></div>
+              <div className="mb-4">
+                The knowledge map takes 2-3 min to generate.
+              </div>
               <button
                 type="submit"
                 className="rounded-xl border border-black p-4 hover:border-b-2 hover:border-r-2"
