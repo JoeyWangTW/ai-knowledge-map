@@ -66,8 +66,8 @@ export function UniversalNode({
   return (
     <>
       <div
-        className={`group relative h-full w-full border border-2 border-black bg-white
-              text-black rounded-xl flex flex-col ${!resized && "w-[750px] h-[750px]"}`}
+        className={`group relative border border-2 border-black bg-white
+              text-black rounded-xl flex flex-col ${!resized && "w-[750px] h-[750px]"} ${resized && "w-full h-full"}`}
       >
         <NodeResizeControl
           minWidth={100}
@@ -82,7 +82,7 @@ export function UniversalNode({
         <h2 className="font-bold text-lg border-b-2 border-black p-4">
           {data.title}
         </h2>
-        <div className="prose py-4 px-6 text-left flex-1 overflow-auto max-w-max">
+        <div className="prose py-4 px-6 text-left flex-1 overflow-auto max-w-full">
           <ReactMarkdown>{data.content}</ReactMarkdown>
         </div>
         <button
