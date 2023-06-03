@@ -5,10 +5,11 @@ export const config = {
 };
 
 export async function POST(req: Request) {
-  const { prompt,context, markdownMode} = (await req.json()) as {
+  const { prompt,context, markdownMode, language} = (await req.json()) as {
     prompt?: string;
     markdownMode?: boolean;
     context?: Array<{ user: string; assistant: string }>;
+    language?: string;
   };
 
   const initPrompt = `Write a high level overview of ${prompt}, and give 5 most important subtopic and their high level overview,
@@ -16,7 +17,8 @@ write in this format
 {"summary": <high level overview>,
                         "subtopic": [{"subtopic": <subtopic>,
 "content": <subtopic high level overview>}, ...]}`
-    const system = `format response in JSON, take any text in "" and use it as keyword, content can be markdown, markwond title start from h2`
+    const system = `format response in JSON, take any text in "" and use it as keyword.
+Content can be markdown, markwond title start from h2. Content must be in ${language}`
 
 
   const messages = context

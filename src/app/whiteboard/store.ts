@@ -33,6 +33,7 @@ export type RFState = {
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
+  language: string;
   importNodesAndEdges: (importedNodes: Node[], importedEdges: Edge[]) => void;
   onUpdateNodeContent: ({
     nodeId,
@@ -60,10 +61,12 @@ export type RFState = {
     topic,
     breadth,
     depth,
+    language,
   }: {
     topic: string;
     breadth: number;
     depth: number;
+    language: string;
   }) => void;
   onDeleteNode: (id: string) => void;
   onDeleteEdge: (id: string) => void;
@@ -87,6 +90,7 @@ const generateResponse = async ({
   onUpdateNodeContent,
   markdownMode,
   context,
+  language
 }: {
   id: string;
   type: string;
@@ -99,6 +103,7 @@ const generateResponse = async ({
     nodeId: string;
     content: string;
   }) => void;
+  language: string;
   context: Array<{ user: string; assistant: string }>;
 }) => {
   const response = await fetch(`/api/${type}`, {
@@ -110,6 +115,7 @@ const generateResponse = async ({
       markdownMode,
       prompt,
       context,
+      language,
     }),
   });
 
@@ -136,9 +142,11 @@ const generateResponse = async ({
 const generatePrompts = async ({
   context,
   count,
+  language,
 }: {
   context: Array<{ user: string; assistant: string }>;
   count: number;
+  language: string
 }) => {
   const response = await fetch("/api/auto-follow-up", {
     method: "POST",
@@ -148,6 +156,7 @@ const generatePrompts = async ({
     body: JSON.stringify({
       context,
       count,
+      language,
     }),
   });
 
@@ -300,6 +309,7 @@ const useStore = create<RFState>((set, get) => ({
       markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
       context: [],
+      language: get().language,
     }).then(() => {
       const sourceNode = get().nodes.find((node) => node.id === newId);
 
@@ -310,6 +320,7 @@ const useStore = create<RFState>((set, get) => ({
         generatePrompts({
           count: 5,
           context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
+      language: get().language,
         }).then((autoPrompts) => {
           get().onUpdateNodeAutoPrompts({
             nodeId: newId,
@@ -319,16 +330,20 @@ const useStore = create<RFState>((set, get) => ({
       }
     });
   },
+  language: "english",
   addInitNodes: async ({
     topic,
     depth,
     breadth,
+    language,
   }: {
     topic: string;
     depth: number;
     breadth: number;
+    language: string
   }) => {
     const newId = getId();
+    set({language})
     set(({ nodes }) => {
       const newNode = {
         id: newId,
@@ -347,6 +362,7 @@ const useStore = create<RFState>((set, get) => ({
       markdownMode: true,
       onUpdateNodeContent: get().onUpdateNodeContent,
       context: [],
+      language: get().language,
     });
 
     const initNode = get().nodes.find((node) => node.id === newId);
@@ -358,6 +374,7 @@ const useStore = create<RFState>((set, get) => ({
       const autoPrompts = await generatePrompts({
         count: breadth,
         context: [{ user: initNodeTitle, assistant: initNodeContent }],
+      language: get().language,
       });
       get().onUpdateNodeAutoPrompts({
         nodeId: newId,
@@ -421,6 +438,7 @@ const useStore = create<RFState>((set, get) => ({
               markdownMode: true,
               onUpdateNodeContent: get().onUpdateNodeContent,
               context: [],
+              language: get().language,
             });
 
             const childNode = get().nodes.find((node) => node.id === newId);
@@ -434,6 +452,7 @@ const useStore = create<RFState>((set, get) => ({
                 context: [
                   { user: childNodeTitle, assistant: childNodeContent },
                 ],
+      language: get().language,
               });
               get().onUpdateNodeAutoPrompts({
                 nodeId: newId,
@@ -577,6 +596,7 @@ const useStore = create<RFState>((set, get) => ({
       markdownMode: markdownMode,
       onUpdateNodeContent: get().onUpdateNodeContent,
       context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
+      language: get().language,
     }).then(() => {
       const sourceNode = get().nodes.find((node) => node.id === newId);
 
@@ -587,6 +607,7 @@ const useStore = create<RFState>((set, get) => ({
         generatePrompts({
           count: 5,
           context: [{ user: sourceNodeTitle, assistant: sourceNodeContent }],
+      language: get().language,
         }).then((autoPrompts) => {
           get().onUpdateNodeAutoPrompts({
             nodeId: newId,
