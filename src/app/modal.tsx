@@ -216,9 +216,17 @@ export function InitModal() {
 
   const [prompt, setPrompt] = useState("");
   const [markdownMode, setMarkdownMode] = useState(true);
+    const [language, setLanguage] = useState(
+      typeof window !== 'undefined' && window.navigator.language.includes('zh') ? 'traditional-chinese' : 'english'
+    );
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrompt(e.target.value);
   };
+
+   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLanguage(e.target.value);
+   };
 
   const handleMarkdownToggle = () => {
     setMarkdownMode((prevMode) => !prevMode);
@@ -227,7 +235,7 @@ export function InitModal() {
   const handlePromptSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     amplitude.track("init-submitted", { prompt: `${prompt}` });
-    addInitNodes({ topic: prompt , breadth: 4, depth: 2});
+    addInitNodes({ topic: prompt , breadth: 4, depth: 2, language: language});
     setPrompt("");
     setShowInitModal(false);
   };
@@ -260,6 +268,14 @@ export function InitModal() {
                 value={prompt}
                 onChange={handleInputChange}
               />
+              <div className="mb-4">
+                <label className="mr-2">Select Language</label>
+                <select className="border border-black rounded px-1 py-1"
+                        value={language} onChange={handleLanguageChange}>  {/* Add this block */}
+                  <option value="english">English</option>
+                  <option value="traditional-chinese">Traditional Chinese</option>
+                </select>
+              </div>
               <div className="mb-4">
                 The knowledge map takes 2-3 min to generate.
               </div>
