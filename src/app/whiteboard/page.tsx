@@ -184,6 +184,31 @@ export default function Home() {
     }
   }, [amplitudeAPIKey]);
 
+
+    useEffect(() => {
+    const script = document.createElement('script');
+
+      script.innerHTML = `
+!function(e,t,r,n){if(!e[n]){for(var a=e[n]=[],i=["survey","reset","config","init","set","get","event","identify","track","page","screen","group","alias"],o=0;o<i.length;o++){var s=i[o];a[s]=a[s]||function(e){return function(){var t=Array.prototype.slice.call(arguments);a.push([e,t])}}(s)}a.SNIPPET_VERSION="1.0.1";var c=t.createElement("script");c.type="text/javascript",c.async=!0,c.src="https://d2yyd1h5u9mauk.cloudfront.net/integrations/web/v1/library/"+r+"/"+n+".js";var u=t.getElementsByTagName("script")[0];u.parentNode.insertBefore(c,u)}}(window,document,"DJYmHTkouARiNYoo","delighted");
+delighted.survey({
+    email: "customer@hemandstitch.com", // customer email (optional)
+    name: "Bailey Dixon",               // customer name (optional)
+    createdAt: "2016-01-01T12:00:00Z",  // time of initial visit (optional)
+    properties: {                       // extra context (optional)
+      plan: "Medium",
+      company: "Hem & Stitch"
+    }
+  });
+      `;
+      script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    }
+    }, []);
+
   return (
     <main className="font-sans flex items-center justify-center w-screen h-screen flex-1 text-center relative">
       <Whiteboard />
