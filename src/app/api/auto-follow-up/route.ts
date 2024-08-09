@@ -26,16 +26,16 @@ ${system}`;
   console.log(prompt)
   const messages = context
     ? [
-        ...context.map((entry) => [
-          { role: "user" || "user", content: entry.user },
-          { role: "assistant" || "user", content: entry.assistant },
-        ]),
-        { role: "user" || "user", content: prompt || "" },
-      ].flat()
+      ...context.map((entry) => [
+        { role: "user" || "user", content: entry.user },
+        { role: "assistant" || "user", content: entry.assistant },
+      ]),
+      { role: "user" || "user", content: prompt || "" },
+    ].flat()
     : [{ role: "user" || "", content: prompt || "" }];
 
   const payload = {
-    model: "gpt-3.5-turbo",
+    model: "gpt-4o-mini",
     messages: messages,
     stream: false,
   };

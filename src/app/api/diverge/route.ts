@@ -19,8 +19,8 @@ subtopics: [{topic: subtopic 1, description: short description of the topic},
 reply in the same language of ${topic}`
 
     const topicOverviewResponse = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [{role: "user", content: Prompt}],
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: Prompt }],
     });
 
     return NextResponse.json(topicOverviewResponse.data)
