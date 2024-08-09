@@ -1,8 +1,9 @@
-# AI Knowledge Graph
+# AI Knowledge Map 
 
-**A Graph interface to explore any topic using AI.**
+**A Knowledge Map interface to help you explore any topic using AI.**
+
 Have you ever wanted to explore a topic in depth, but didn't know where to start?
-AI Knowledge Graph is a tool that uses AI to help you ask the rigtht questions and help you explore using a whiteboard interface.
+AI Knowledge Map is a tool that uses AI to help you ask the rigtht questions and help you explore using a whiteboard knowledge map interface.
 
 Visit [AIKnowledgeMap.com](https://aiknowledgemap.com) to try it out.
 
