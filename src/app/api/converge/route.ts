@@ -14,8 +14,8 @@ export async function GET(request: Request) {
 Write it in markdown, use only h2 title and bellow, Use bullet points if needed.
 reply in the same language of ${topic}`
     const topicOverviewResponse = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [{role: "user", content: Prompt}],
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: Prompt }],
     });
 
     return NextResponse.json(topicOverviewResponse.data)
